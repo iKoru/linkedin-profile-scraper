@@ -6,36 +6,36 @@ const moment_timezone_1 = tslib_1.__importDefault(require("moment-timezone"));
 const i18n_iso_countries_1 = tslib_1.__importDefault(require("i18n-iso-countries"));
 const all_the_cities_1 = tslib_1.__importDefault(require("all-the-cities"));
 exports.getIsCountry = (text) => {
-    const countriesList = Object.values(i18n_iso_countries_1.default.getNames('en'));
+    const countriesList = Object.values(i18n_iso_countries_1.default.getNames("en"));
     const lowerCaseText = text.toLowerCase();
-    if (['united states', 'the netherlands'].includes(lowerCaseText)) {
+    if (["united states", "the netherlands"].includes(lowerCaseText)) {
         return true;
     }
-    return !!countriesList.find(country => country.toLowerCase() === lowerCaseText);
+    return !!countriesList.find((country) => country.toLowerCase() === lowerCaseText);
 };
 exports.getIsCity = (text) => {
     const lowerCaseText = text.toLowerCase();
-    if (['new york'].includes(lowerCaseText)) {
+    if (["new york"].includes(lowerCaseText)) {
         return true;
     }
-    return !!all_the_cities_1.default.find(city => city.name.toLowerCase() === lowerCaseText);
+    return !!all_the_cities_1.default.find((city) => city.name.toLowerCase() === lowerCaseText);
 };
 exports.formatDate = (date) => {
-    if (date === 'Present' || date === 'present') {
+    if (date === "Present" || date === "present") {
         return moment_timezone_1.default.utc().toISOString();
     }
-    return moment_timezone_1.default(date, 'MMMY').toISOString();
+    return moment_timezone_1.default(date, "MMMY").toISOString();
 };
 exports.getDurationInDays = (formattedStartDate, formattedEndDate) => {
     if (!formattedStartDate || !formattedEndDate)
         return null;
-    return moment_timezone_1.default(formattedEndDate).diff(moment_timezone_1.default(formattedStartDate), 'days') + 1;
+    return moment_timezone_1.default(formattedEndDate).diff(moment_timezone_1.default(formattedStartDate), "days") + 1;
 };
 exports.getLocationFromText = (text) => {
     if (!text)
         return null;
-    const cleanText = text.replace(' Area', '').trim();
-    const parts = cleanText.split(', ');
+    const cleanText = text.replace(" Area", "").trim();
+    const parts = cleanText.split(", ");
     let city = null;
     let province = null;
     let country = null;
@@ -46,7 +46,7 @@ exports.getLocationFromText = (text) => {
         return {
             city,
             province,
-            country
+            country,
         };
     }
     if (parts.length === 2) {
@@ -54,40 +54,40 @@ exports.getLocationFromText = (text) => {
             return {
                 city: parts[0],
                 province,
-                country: parts[1]
+                country: parts[1],
             };
         }
         if (exports.getIsCity(parts[0]) && !exports.getIsCountry(parts[1])) {
             return {
                 city: parts[0],
                 province: parts[1],
-                country
+                country,
             };
         }
         return {
             city,
             province: parts[0],
-            country: parts[1]
+            country: parts[1],
         };
     }
     if (exports.getIsCountry(parts[0])) {
         return {
             city,
             province,
-            country: parts[0]
+            country: parts[0],
         };
     }
     if (exports.getIsCity(parts[0])) {
         return {
             city: parts[0],
             province,
-            country
+            country,
         };
     }
     return {
         city,
         province: parts[0],
-        country
+        country,
     };
 };
 exports.getCleanText = (text) => {
@@ -96,31 +96,31 @@ exports.getCleanText = (text) => {
     if (!text)
         return null;
     const cleanText = text
-        .replace(regexRemoveLineBreaks, '')
-        .replace(regexRemoveMultipleSpaces, ' ')
-        .replace(/(\.\.\.|…)$/, '')
-        .replace(/\s*(see more|see less)\s*$/i, '')
-        .replace(/^\s*(organization name|organization date|organization position|organization description|language name|project name|project description|)\s*/i, '')
+        .replace(regexRemoveLineBreaks, "")
+        .replace(regexRemoveMultipleSpaces, " ")
+        .replace(/(\.\.\.|…)$/, "")
+        .replace(/\s*(see more|see less)\s*$/i, "")
+        .replace(/^\s*(organization name|organization date|organization position|organization description|language name|project name|project description|)\s*/i, "")
         .trim();
     return cleanText;
 };
 exports.statusLog = (section, message, scraperSessionId) => {
-    const sessionPart = (scraperSessionId) ? ` (${scraperSessionId})` : '';
-    const messagePart = (message) ? `: ${message}` : null;
+    const sessionPart = scraperSessionId ? ` (${scraperSessionId})` : "";
+    const messagePart = message ? `: ${message}` : null;
     return console.log(`Scraper (${section})${sessionPart}${messagePart}`);
 };
 exports.autoScroll = (page) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     yield page.evaluate(() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
         yield new Promise((resolve, reject) => {
-            var totalHeight = 0;
-            var distance = 500;
-            var timer = setInterval(() => {
-                var scrollHeight = document.body.scrollHeight;
+            let totalHeight = 0;
+            let distance = 500;
+            let timer = setInterval(() => {
+                let scrollHeight = document.body.scrollHeight;
                 window.scrollBy(0, distance);
                 totalHeight += distance;
                 if (totalHeight >= scrollHeight) {
                     clearInterval(timer);
-                    resolve();
+                    resolve(true);
                 }
             }, 100);
         });

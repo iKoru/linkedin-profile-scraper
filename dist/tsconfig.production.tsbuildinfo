@@ -156,6 +156,71 @@
         "signature": "4745ef5a44003882e6ca2b30c838ce5b59dbf2c170e672b62e6fd088347b7057",
         "affectsGlobalScope": false
       },
+      "../node_modules/devtools-protocol/types/protocol.d.ts": {
+        "version": "048f50361b3948e92aca0148d6a7c566843164830c1aa70962179052f576479c",
+        "signature": "048f50361b3948e92aca0148d6a7c566843164830c1aa70962179052f576479c",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/devtools-protocol/types/protocol-mapping.d.ts": {
+        "version": "6d18352a53bff1aae48a9dd3b7111c442b41992354be6b6bcb24749bb9a02ddf",
+        "signature": "6d18352a53bff1aae48a9dd3b7111c442b41992354be6b6bcb24749bb9a02ddf",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/puppeteer-core/lib/types.d.ts": {
+        "version": "c81e051c9a85bb7e97b6b90465fcf8e89369d6c5df0a2a0f31694c75faab151c",
+        "signature": "c81e051c9a85bb7e97b6b90465fcf8e89369d6c5df0a2a0f31694c75faab151c",
+        "affectsGlobalScope": true
+      },
+      "../node_modules/chrome-aws-lambda/typings/chrome-aws-lambda.d.ts": {
+        "version": "33fcab9da3566d329c6fa57fe8534329bc4f9caf29ed68976c3433eed3922727",
+        "signature": "33fcab9da3566d329c6fa57fe8534329bc4f9caf29ed68976c3433eed3922727",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/chrome-aws-lambda/build/index.d.ts": {
+        "version": "e8376775255c45e52b7381ed7aa78c83d5231c9313475d35f2afe9836762690e",
+        "signature": "e8376775255c45e52b7381ed7aa78c83d5231c9313475d35f2afe9836762690e",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/tree-kill/index.d.ts": {
+        "version": "8323e3f5b91261ed250bd7c6b7aba2aa10f8e1c2ef348297c1f7752a403abebd",
+        "signature": "8323e3f5b91261ed250bd7c6b7aba2aa10f8e1c2ef348297c1f7752a403abebd",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/moment/ts3.1-typings/moment.d.ts": {
+        "version": "4051f6311deb0ce6052329eeb1cd4b1b104378fe52f882f483130bea75f92197",
+        "signature": "4051f6311deb0ce6052329eeb1cd4b1b104378fe52f882f483130bea75f92197",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/moment-timezone/index.d.ts": {
+        "version": "75b4df517570229d59a1951e1f283e17f232b8c1df8cb675f1bbb127da208e2e",
+        "signature": "75b4df517570229d59a1951e1f283e17f232b8c1df8cb675f1bbb127da208e2e",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/i18n-iso-countries/index.d.ts": {
+        "version": "d399ec13a81b9587f96833daf4d03dfbbbae1dfa078a9ecd523ee584899b72c3",
+        "signature": "d399ec13a81b9587f96833daf4d03dfbbbae1dfa078a9ecd523ee584899b72c3",
+        "affectsGlobalScope": false
+      },
+      "../src/utils/index.ts": {
+        "version": "68ca9f80b0f682c2b7e4cf76d0958994ea3b491bf93ac74cc06cd0c0359e9e3e",
+        "signature": "6f5321c204d88cf19e2659207fdf269fc56c6e24ee254885d1236fd48e10d57a",
+        "affectsGlobalScope": false
+      },
+      "../src/index.ts": {
+        "version": "12a99dfb400aa2973ce51c2e4b071c5dfa03c837b8b06fedbdd2718fc99fef0b",
+        "signature": "df82dcb9ccccb034199f1b3178d34c0c5e45c2df21c4ff74472f99a8bf483a03",
+        "affectsGlobalScope": false
+      },
+      "../src/examples/list-of-urls.ts": {
+        "version": "df8183db58e63754b49b18196b22e021ec6e29cd87a9f275be389f368e36ab5e",
+        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+        "affectsGlobalScope": false
+      },
+      "../src/examples/module.ts": {
+        "version": "b3387ad5b8526e73c70f2405085ea1fad7fece26aab29075960bc688b74e8c12",
+        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+        "affectsGlobalScope": false
+      },
       "../node_modules/@types/node/globals.d.ts": {
         "version": "fae548bb4dd54b5562ba24f95ec6577da578f3d87b6c952bb9d6ebe29237abd0",
         "signature": "fae548bb4dd54b5562ba24f95ec6577da578f3d87b6c952bb9d6ebe29237abd0",
@@ -411,61 +476,6 @@
         "signature": "d522314e80ed71b57e3c2939d3c9594eaae63a4adf028559e6574f6b270b0fee",
         "affectsGlobalScope": false
       },
-      "../node_modules/@types/puppeteer/Errors.d.ts": {
-        "version": "24074eb89fe21d5d7d8a5ed86e6c56939cf32d533f68bae213b0cdac74e03d3b",
-        "signature": "24074eb89fe21d5d7d8a5ed86e6c56939cf32d533f68bae213b0cdac74e03d3b",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/@types/puppeteer/DeviceDescriptors.d.ts": {
-        "version": "c9c23a4476436315c1a675f807128457b5aeadc8d3d75340e1f4b93af73551ce",
-        "signature": "c9c23a4476436315c1a675f807128457b5aeadc8d3d75340e1f4b93af73551ce",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/@types/puppeteer/index.d.ts": {
-        "version": "690e105b28b0ac9f20e26b39f4a5ebb6fdafea7056468a4c29a3248b4ad8aea0",
-        "signature": "690e105b28b0ac9f20e26b39f4a5ebb6fdafea7056468a4c29a3248b4ad8aea0",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/tree-kill/index.d.ts": {
-        "version": "8323e3f5b91261ed250bd7c6b7aba2aa10f8e1c2ef348297c1f7752a403abebd",
-        "signature": "8323e3f5b91261ed250bd7c6b7aba2aa10f8e1c2ef348297c1f7752a403abebd",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/moment/ts3.1-typings/moment.d.ts": {
-        "version": "ee08b4d535febfed2ab0ed4a943c26eee9646a0b6fd674552d925544e0e0afd4",
-        "signature": "ee08b4d535febfed2ab0ed4a943c26eee9646a0b6fd674552d925544e0e0afd4",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/moment-timezone/index.d.ts": {
-        "version": "8621a7b709bc463d5ab5a96d95bae465323fbf80b8a3d9eff5d2d6b60c795dd1",
-        "signature": "8621a7b709bc463d5ab5a96d95bae465323fbf80b8a3d9eff5d2d6b60c795dd1",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/i18n-iso-countries/index.d.ts": {
-        "version": "d399ec13a81b9587f96833daf4d03dfbbbae1dfa078a9ecd523ee584899b72c3",
-        "signature": "d399ec13a81b9587f96833daf4d03dfbbbae1dfa078a9ecd523ee584899b72c3",
-        "affectsGlobalScope": false
-      },
-      "../src/utils/index.ts": {
-        "version": "f13355366526f537c4a469f13005a6f7ca28f4210029a9150f623d018160bcbd",
-        "signature": "766c9fe49658e552eb7a10f2be81b22a81280c00c3d8fadcd02c4a89f020bc1c",
-        "affectsGlobalScope": false
-      },
-      "../src/index.ts": {
-        "version": "5c4be50b183347d367561452918742313aeda2535da93352cdbbf023401c1606",
-        "signature": "bebf804e31e9a01350cdef83055818d517726f9ca9f6078860fb8b00d51e00e3",
-        "affectsGlobalScope": false
-      },
-      "../src/examples/list-of-urls.ts": {
-        "version": "df8183db58e63754b49b18196b22e021ec6e29cd87a9f275be389f368e36ab5e",
-        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
-        "affectsGlobalScope": false
-      },
-      "../src/examples/module.ts": {
-        "version": "b3387ad5b8526e73c70f2405085ea1fad7fece26aab29075960bc688b74e8c12",
-        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
-        "affectsGlobalScope": false
-      },
       "../node_modules/@types/range-parser/index.d.ts": {
         "version": "4e88b833be14c7f384e0dcd57bb30acd799e8e34d212635d693e41a75a71164b",
         "signature": "4e88b833be14c7f384e0dcd57bb30acd799e8e34d212635d693e41a75a71164b",
@@ -516,7 +526,7 @@
         "signature": "3e2d7a10ed06d95cdf502dbfee1d9e4b0372e8b3f17614c4d5a74f5a81b831ed",
         "affectsGlobalScope": false
       },
-      "../node_modules/jest-diff/build/cleanupSemantic.d.ts": {
+      "../node_modules/jest-diff/build/cleanupsemantic.d.ts": {
         "version": "e222104af6cb9415238ad358488b74d76eceeff238c1268ec6e85655b05341da",
         "signature": "e222104af6cb9415238ad358488b74d76eceeff238c1268ec6e85655b05341da",
         "affectsGlobalScope": false
@@ -526,12 +536,12 @@
         "signature": "69da61a7b5093dac77fa3bec8be95dcf9a74c95a0e9161edb98bb24e30e439d2",
         "affectsGlobalScope": false
       },
-      "../node_modules/jest-diff/build/diffLines.d.ts": {
+      "../node_modules/jest-diff/build/difflines.d.ts": {
         "version": "eba230221317c985ab1953ccc3edc517f248b37db4fef7875cb2c8d08aff7be7",
         "signature": "eba230221317c985ab1953ccc3edc517f248b37db4fef7875cb2c8d08aff7be7",
         "affectsGlobalScope": false
       },
-      "../node_modules/jest-diff/build/printDiffs.d.ts": {
+      "../node_modules/jest-diff/build/printdiffs.d.ts": {
         "version": "b83e796810e475da3564c6515bc0ae9577070596a33d89299b7d99f94ecfd921",
         "signature": "b83e796810e475da3564c6515bc0ae9577070596a33d89299b7d99f94ecfd921",
         "affectsGlobalScope": false
@@ -563,7 +573,7 @@
       }
     },
     "options": {
-      "baseUrl": "../../../../../..",
+      "baseUrl": "../../../../..",
       "importHelpers": true,
       "allowJs": false,
       "allowSyntheticDefaultImports": true,
@@ -1074,29 +1084,6 @@
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
       ],
-      "../node_modules/@types/puppeteer/DeviceDescriptors.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts",
-        "../node_modules/@types/node/util.d.ts"
-      ],
-      "../node_modules/@types/puppeteer/Errors.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts",
-        "../node_modules/@types/node/util.d.ts"
-      ],
-      "../node_modules/@types/puppeteer/index.d.ts": [
-        "../node_modules/@types/node/child_process.d.ts",
-        "../node_modules/@types/node/events.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts",
-        "../node_modules/@types/node/ts3.7/index.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/puppeteer/DeviceDescriptors.d.ts",
-        "../node_modules/@types/puppeteer/Errors.d.ts"
-      ],
       "../node_modules/@types/qs/index.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
@@ -1117,24 +1104,52 @@
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
       ],
+      "../node_modules/chrome-aws-lambda/build/index.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/chrome-aws-lambda/typings/chrome-aws-lambda.d.ts",
+        "../node_modules/puppeteer-core/lib/types.d.ts"
+      ],
+      "../node_modules/chrome-aws-lambda/typings/chrome-aws-lambda.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/puppeteer-core/lib/types.d.ts"
+      ],
+      "../node_modules/devtools-protocol/types/protocol-mapping.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/devtools-protocol/types/protocol.d.ts"
+      ],
+      "../node_modules/devtools-protocol/types/protocol.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts"
+      ],
       "../node_modules/i18n-iso-countries/index.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
       ],
-      "../node_modules/jest-diff/build/cleanupSemantic.d.ts": [
+      "../node_modules/jest-diff/build/cleanupsemantic.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
       ],
-      "../node_modules/jest-diff/build/diffLines.d.ts": [
+      "../node_modules/jest-diff/build/difflines.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts",
-        "../node_modules/jest-diff/build/cleanupSemantic.d.ts",
+        "../node_modules/jest-diff/build/cleanupsemantic.d.ts",
         "../node_modules/jest-diff/build/types.d.ts"
       ],
       "../node_modules/jest-diff/build/index.d.ts": [
@@ -1142,17 +1157,17 @@
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts",
-        "../node_modules/jest-diff/build/cleanupSemantic.d.ts",
-        "../node_modules/jest-diff/build/diffLines.d.ts",
-        "../node_modules/jest-diff/build/printDiffs.d.ts",
+        "../node_modules/jest-diff/build/cleanupsemantic.d.ts",
+        "../node_modules/jest-diff/build/difflines.d.ts",
+        "../node_modules/jest-diff/build/printdiffs.d.ts",
         "../node_modules/jest-diff/build/types.d.ts"
       ],
-      "../node_modules/jest-diff/build/printDiffs.d.ts": [
+      "../node_modules/jest-diff/build/printdiffs.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts",
-        "../node_modules/jest-diff/build/cleanupSemantic.d.ts",
+        "../node_modules/jest-diff/build/cleanupsemantic.d.ts",
         "../node_modules/jest-diff/build/types.d.ts"
       ],
       "../node_modules/jest-diff/build/types.d.ts": [
@@ -1186,6 +1201,16 @@
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
+      ],
+      "../node_modules/puppeteer-core/lib/types.d.ts": [
+        "../node_modules/@types/node/child_process.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/stream.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/devtools-protocol/types/protocol-mapping.d.ts",
+        "../node_modules/devtools-protocol/types/protocol.d.ts"
       ],
       "../node_modules/tree-kill/index.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
@@ -1406,7 +1431,8 @@
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/puppeteer/index.d.ts",
+        "../node_modules/chrome-aws-lambda/build/index.d.ts",
+        "../node_modules/puppeteer-core/lib/types.d.ts",
         "../node_modules/tree-kill/index.d.ts",
         "../src/blocked-hosts.ts",
         "../src/errors.ts",
@@ -1423,9 +1449,9 @@
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/puppeteer/index.d.ts",
         "../node_modules/i18n-iso-countries/index.d.ts",
         "../node_modules/moment-timezone/index.d.ts",
+        "../node_modules/puppeteer-core/lib/types.d.ts",
         "../src/index.ts",
         "../src/typings/all-the-cities/index.d.ts"
       ]
@@ -1894,29 +1920,6 @@
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
       ],
-      "../node_modules/@types/puppeteer/DeviceDescriptors.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts",
-        "../node_modules/@types/node/util.d.ts"
-      ],
-      "../node_modules/@types/puppeteer/Errors.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts",
-        "../node_modules/@types/node/util.d.ts"
-      ],
-      "../node_modules/@types/puppeteer/index.d.ts": [
-        "../node_modules/@types/node/child_process.d.ts",
-        "../node_modules/@types/node/events.d.ts",
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts",
-        "../node_modules/@types/node/ts3.7/index.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/@types/puppeteer/DeviceDescriptors.d.ts",
-        "../node_modules/@types/puppeteer/Errors.d.ts"
-      ],
       "../node_modules/@types/qs/index.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
@@ -1937,24 +1940,52 @@
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
       ],
+      "../node_modules/chrome-aws-lambda/build/index.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/chrome-aws-lambda/typings/chrome-aws-lambda.d.ts",
+        "../node_modules/puppeteer-core/lib/types.d.ts"
+      ],
+      "../node_modules/chrome-aws-lambda/typings/chrome-aws-lambda.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/puppeteer-core/lib/types.d.ts"
+      ],
+      "../node_modules/devtools-protocol/types/protocol-mapping.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/devtools-protocol/types/protocol.d.ts"
+      ],
+      "../node_modules/devtools-protocol/types/protocol.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts"
+      ],
       "../node_modules/i18n-iso-countries/index.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
       ],
-      "../node_modules/jest-diff/build/cleanupSemantic.d.ts": [
+      "../node_modules/jest-diff/build/cleanupsemantic.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
       ],
-      "../node_modules/jest-diff/build/diffLines.d.ts": [
+      "../node_modules/jest-diff/build/difflines.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts",
-        "../node_modules/jest-diff/build/cleanupSemantic.d.ts",
+        "../node_modules/jest-diff/build/cleanupsemantic.d.ts",
         "../node_modules/jest-diff/build/types.d.ts"
       ],
       "../node_modules/jest-diff/build/index.d.ts": [
@@ -1962,17 +1993,17 @@
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts",
-        "../node_modules/jest-diff/build/cleanupSemantic.d.ts",
-        "../node_modules/jest-diff/build/diffLines.d.ts",
-        "../node_modules/jest-diff/build/printDiffs.d.ts",
+        "../node_modules/jest-diff/build/cleanupsemantic.d.ts",
+        "../node_modules/jest-diff/build/difflines.d.ts",
+        "../node_modules/jest-diff/build/printdiffs.d.ts",
         "../node_modules/jest-diff/build/types.d.ts"
       ],
-      "../node_modules/jest-diff/build/printDiffs.d.ts": [
+      "../node_modules/jest-diff/build/printdiffs.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts",
-        "../node_modules/jest-diff/build/cleanupSemantic.d.ts",
+        "../node_modules/jest-diff/build/cleanupsemantic.d.ts",
         "../node_modules/jest-diff/build/types.d.ts"
       ],
       "../node_modules/jest-diff/build/types.d.ts": [
@@ -2006,6 +2037,16 @@
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
+      ],
+      "../node_modules/puppeteer-core/lib/types.d.ts": [
+        "../node_modules/@types/node/child_process.d.ts",
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/stream.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts",
+        "../node_modules/devtools-protocol/types/protocol-mapping.d.ts",
+        "../node_modules/devtools-protocol/types/protocol.d.ts"
       ],
       "../node_modules/tree-kill/index.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
@@ -2188,7 +2229,7 @@
         "../node_modules/@types/node/util.d.ts"
       ],
       "../src/index.ts": [
-        "../node_modules/@types/puppeteer/index.d.ts"
+        "../node_modules/puppeteer-core/lib/types.d.ts"
       ],
       "../src/typings/all-the-cities/index.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
@@ -2197,8 +2238,8 @@
         "../node_modules/@types/node/util.d.ts"
       ],
       "../src/utils/index.ts": [
-        "../node_modules/@types/puppeteer/index.d.ts",
         "../node_modules/moment-timezone/index.d.ts",
+        "../node_modules/puppeteer-core/lib/types.d.ts",
         "../src/index.ts"
       ]
     },
@@ -2261,22 +2302,24 @@
       "../node_modules/@types/node/vm.d.ts",
       "../node_modules/@types/node/worker_threads.d.ts",
       "../node_modules/@types/node/zlib.d.ts",
-      "../node_modules/@types/puppeteer/DeviceDescriptors.d.ts",
-      "../node_modules/@types/puppeteer/Errors.d.ts",
-      "../node_modules/@types/puppeteer/index.d.ts",
       "../node_modules/@types/qs/index.d.ts",
       "../node_modules/@types/range-parser/index.d.ts",
       "../node_modules/@types/serve-static/index.d.ts",
+      "../node_modules/chrome-aws-lambda/build/index.d.ts",
+      "../node_modules/chrome-aws-lambda/typings/chrome-aws-lambda.d.ts",
+      "../node_modules/devtools-protocol/types/protocol-mapping.d.ts",
+      "../node_modules/devtools-protocol/types/protocol.d.ts",
       "../node_modules/i18n-iso-countries/index.d.ts",
-      "../node_modules/jest-diff/build/cleanupSemantic.d.ts",
-      "../node_modules/jest-diff/build/diffLines.d.ts",
+      "../node_modules/jest-diff/build/cleanupsemantic.d.ts",
+      "../node_modules/jest-diff/build/difflines.d.ts",
       "../node_modules/jest-diff/build/index.d.ts",
-      "../node_modules/jest-diff/build/printDiffs.d.ts",
+      "../node_modules/jest-diff/build/printdiffs.d.ts",
       "../node_modules/jest-diff/build/types.d.ts",
       "../node_modules/moment-timezone/index.d.ts",
       "../node_modules/moment/ts3.1-typings/moment.d.ts",
       "../node_modules/pretty-format/build/index.d.ts",
       "../node_modules/pretty-format/build/types.d.ts",
+      "../node_modules/puppeteer-core/lib/types.d.ts",
       "../node_modules/tree-kill/index.d.ts",
       "../node_modules/tslib/tslib.d.ts",
       "../node_modules/typescript/lib/lib.dom.d.ts",

@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+import { Page, Viewport } from "puppeteer-core";
 export interface Location {
     city: string | null;
     province: string | null;
@@ -89,6 +89,7 @@ interface ScraperUserDefinedOptions {
     userAgent?: string;
     timeout?: number;
     headless?: boolean;
+    executablePath?: string;
 }
 interface ScraperOptions {
     sessionCookieValue: string;
@@ -96,6 +97,8 @@ interface ScraperOptions {
     userAgent: string;
     timeout: number;
     headless: boolean;
+    executablePath: string | null;
+    defaultViewport: Required<Viewport>;
 }
 export declare class LinkedInProfileScraper {
     readonly options: ScraperOptions;
@@ -106,7 +109,7 @@ export declare class LinkedInProfileScraper {
     isPuppeteerLoaded: () => Promise<boolean>;
     private createPage;
     private getBlockedHosts;
-    close: (page?: puppeteer.Page | undefined) => Promise<void>;
+    close: (page?: Page | undefined) => Promise<void>;
     checkIfLoggedIn: () => Promise<void>;
     run: (profileUrl: string) => Promise<{
         userProfile: Profile;
