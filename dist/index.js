@@ -150,9 +150,10 @@ class LinkedInProfileScraper {
                         return req.abort();
                     }
                     const hostname = utils_1.getHostname(req.url());
-                    if (blockedResourcesByHost.includes(req.resourceType()) &&
+                    if ((blockedResourcesByHost.includes(req.resourceType()) &&
                         hostname &&
-                        blockedHosts[hostname] === true) {
+                        blockedHosts[hostname] === true) ||
+                        req.url() === "https://www.linkedin.com/li/track") {
                         utils_1.statusLog("blocked script", `${req.resourceType()}: ${hostname}: ${req.url()}`);
                         return req.abort();
                     }

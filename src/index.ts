@@ -477,7 +477,7 @@ export class LinkedInProfileScraper {
           (blockedResourcesByHost.includes(req.resourceType()) &&
             hostname &&
             blockedHosts[hostname] === true) ||
-          hostname === "https://www.linkedin.com/li/track"
+          req.url() === "https://www.linkedin.com/li/track"
         ) {
           statusLog(
             "blocked script",
