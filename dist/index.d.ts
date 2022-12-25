@@ -36,6 +36,7 @@ export interface Education {
     startDate: string | null;
     endDate: string | null;
     durationInDays: number | null;
+    description: string | null;
 }
 export interface VolunteerExperience {
     title: string | null;
@@ -73,10 +74,16 @@ export interface LanguageAccomplishments {
 }
 export interface RawProjectAccomplishments {
     name: string | null;
+    startDate: string | null;
+    endDate: string | null;
+    endDateIsPresent: boolean;
     description: string | null;
 }
 export interface ProjectAccomplishments {
     name: string | null;
+    startDate: string | null;
+    endDate: string | null;
+    endDateIsPresent: boolean;
     description: string | null;
 }
 export interface Skill {

@@ -24,7 +24,11 @@ exports.formatDate = (date) => {
     if (date === "Present" || date === "present") {
         return moment_timezone_1.default.utc().toISOString();
     }
-    return moment_timezone_1.default(date, "MMMY").toISOString();
+    return typeof date === "string" && date.includes("년")
+        ? date.length < 6
+            ? moment_timezone_1.default(date, "YYYY년").toISOString()
+            : moment_timezone_1.default(date, "YYYY년 M월").toISOString()
+        : moment_timezone_1.default(date, "MMMY").toISOString();
 };
 exports.getDurationInDays = (formattedStartDate, formattedEndDate) => {
     if (!formattedStartDate || !formattedEndDate)
@@ -100,6 +104,7 @@ exports.getCleanText = (text) => {
         .replace(regexRemoveMultipleSpaces, " ")
         .replace(/(\.\.\.|…)$/, "")
         .replace(/\s*(see more|see less)\s*$/i, "")
+        .replace(/\<span class="white\-space\-pre"\> \<\/span>/gi, "\n")
         .replace(/^\s*(organization name|organization date|organization position|organization description|language name|project name|project description|)\s*/i, "")
         .trim();
     return cleanText;

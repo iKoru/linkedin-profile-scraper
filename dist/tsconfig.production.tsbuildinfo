@@ -202,13 +202,13 @@
         "affectsGlobalScope": false
       },
       "../src/utils/index.ts": {
-        "version": "68ca9f80b0f682c2b7e4cf76d0958994ea3b491bf93ac74cc06cd0c0359e9e3e",
+        "version": "6507f78812ceea77a705933acff046a736d928ac76ed29a62f79f5f1ecf95361",
         "signature": "6f5321c204d88cf19e2659207fdf269fc56c6e24ee254885d1236fd48e10d57a",
         "affectsGlobalScope": false
       },
       "../src/index.ts": {
-        "version": "cf22ba5a40591313d773889fc148b3f6bde60eaedaaa525aeb3b931b4b2249d7",
-        "signature": "df82dcb9ccccb034199f1b3178d34c0c5e45c2df21c4ff74472f99a8bf483a03",
+        "version": "98075725c979562762a01995e498aae5bf6bbc51f4fcde5ab0a829b2b6088799",
+        "signature": "5d931bf9e2956d0a3b7cf0a9ce132927f68089ce2d70d844f7e1ccdd65e4166d",
         "affectsGlobalScope": false
       },
       "../src/examples/list-of-urls.ts": {

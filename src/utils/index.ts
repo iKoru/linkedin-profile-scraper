@@ -34,7 +34,11 @@ export const formatDate = (date: moment.MomentInput | string): string => {
     return moment.utc().toISOString();
   }
 
-  return moment(date, "MMMY").toISOString();
+  return typeof date === "string" && date.includes("년")
+    ? date.length < 6
+      ? moment(date, "YYYY년").toISOString()
+      : moment(date, "YYYY년 M월").toISOString()
+    : moment(date, "MMMY").toISOString();
 };
 
 export const getDurationInDays = (
@@ -142,6 +146,7 @@ export const getCleanText = (text: string | null) => {
     .replace(regexRemoveMultipleSpaces, " ")
     .replace(/(\.\.\.|…)$/, "")
     .replace(/\s*(see more|see less)\s*$/i, "")
+    .replace(/\<span class="white\-space\-pre"\> \<\/span>/gi, "\n")
     .replace(
       /^\s*(organization name|organization date|organization position|organization description|language name|project name|project description|)\s*/i,
       ""

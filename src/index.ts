@@ -80,6 +80,7 @@ interface RawEducation {
   fieldOfStudy: string | null;
   startDate: string | null;
   endDate: string | null;
+  description: string | null;
 }
 
 export interface Education {
@@ -89,6 +90,7 @@ export interface Education {
   startDate: string | null;
   endDate: string | null;
   durationInDays: number | null;
+  description: string | null;
 }
 
 interface RawVolunteerExperience {
@@ -141,11 +143,17 @@ export interface LanguageAccomplishments {
 
 export interface RawProjectAccomplishments {
   name: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  endDateIsPresent: boolean;
   description: string | null;
 }
 
 export interface ProjectAccomplishments {
   name: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  endDateIsPresent: boolean;
   description: string | null;
 }
 
@@ -382,6 +390,7 @@ export class LinkedInProfileScraper {
           "--password-store=basic",
           "--use-gl=swiftshader",
           "--use-mock-keychain",
+          "--lang=ko-KR,ko",
         ],
         timeout: this.options.timeout,
       });
@@ -424,6 +433,7 @@ export class LinkedInProfileScraper {
       "object",
       "beacon",
       "csp_report",
+      "csp",
       "imageset",
     ]; // not blocking image since we want profile pics
 
@@ -477,7 +487,13 @@ export class LinkedInProfileScraper {
           (blockedResourcesByHost.includes(req.resourceType()) &&
             hostname &&
             blockedHosts[hostname] === true) ||
-          req.url() === "https://www.linkedin.com/li/track"
+          req.url() === "https://www.linkedin.com/li/track" ||
+          req
+            .url()
+            .includes(
+              "https://www.linkedin.com/realtime/realtimeFrontendClientConnectivityTracking"
+            ) ||
+          req.url().includes("https://www.linkedin.com/security/csp")
         ) {
           statusLog(
             "blocked script",
@@ -687,10 +703,10 @@ export class LinkedInProfileScraper {
       await page.goto(profileUrl, {
         // Use "networkidl2" here and not "domcontentloaded".
         // As with "domcontentloaded" some elements might not be loaded correctly, resulting in missing data.
-        waitUntil: "networkidle2",
+        waitUntil: "domcontentloaded",
         timeout: this.options.timeout,
       });
-
+      page.waitForTimeout(1500);
       statusLog(logSection, "LinkedIn profile page loaded!", scraperSessionId);
 
       statusLog(
@@ -700,12 +716,12 @@ export class LinkedInProfileScraper {
       );
 
       await autoScroll(page);
-
+      page.waitForTimeout(2000);
       statusLog(logSection, "Parsing data...", scraperSessionId);
 
       // Only click the expanding buttons when they exist
       const expandButtonsSelectors = [
-        ".pv-profile-section.pv-about-section .lt-line-clamp__more", // About
+        ".pvs-list__footer-wrapper .pv-profile-section.pv-about-section .lt-line-clamp__more", // About
         "#experience-section .inline-show-more-text__button.link", // Experience
         '#experience-section [aria-expanded="false"]',
         '#certifications-section [aria-expanded="false"]', // Certifications,
@@ -738,13 +754,13 @@ export class LinkedInProfileScraper {
               scraperSessionId
             );
             await page.click(buttonSelector);
-            await page.waitFor(100);
+            await page.waitForTimeout(100);
 
             // since certifications sort of paginate expands
             if (buttonSelector.startsWith("#certifications-section")) {
               while ((await page.$(buttonSelector)) != null) {
                 await page.click(buttonSelector);
-                await page.waitFor(100);
+                await page.waitForTimeout(100);
               }
             }
           }
@@ -758,7 +774,7 @@ export class LinkedInProfileScraper {
       }
 
       // To give a little room to let data appear. Setting this to 0 might result in "Node is detached from document" errors
-      await page.waitFor(200);
+      await page.waitForTimeout(200);
 
       statusLog(
         logSection,
@@ -778,7 +794,7 @@ export class LinkedInProfileScraper {
                 scraperSessionId
               );
               await button.click();
-              await page.waitFor(100);
+              await page.waitForTimeout(100);
             } catch (err) {
               statusLog(
                 logSection,
@@ -790,7 +806,7 @@ export class LinkedInProfileScraper {
         }
       }
 
-      await page.waitFor(200);
+      await page.waitForTimeout(200);
 
       statusLog(logSection, "Parsing profile data...", scraperSessionId);
 
@@ -820,8 +836,18 @@ export class LinkedInProfileScraper {
           ) || profileSection?.querySelector(".profile-photo-edit__preview");
         const photo = photoElement?.getAttribute("src") || null;
 
-        const descriptionElement = document.querySelector(".pv-about-section"); // Is outside "profileSection"
-        const description = descriptionElement?.textContent || null;
+        // const descriptionElement = document.querySelector(".pv-about-section"); // Is outside "profileSection"
+        let description =
+          document
+            .querySelector("#about")
+            ?.nextElementSibling?.nextElementSibling?.querySelector(
+              'span[aria-hidden="true"]'
+            )?.innerHTML || null;
+        if (description) {
+          description = description
+            .replace(/<!---->/gi, "")
+            .replace(/<br(\/)?>/gi, "\n");
+        }
 
         return {
           fullName,
@@ -853,6 +879,80 @@ export class LinkedInProfileScraper {
 
       statusLog(logSection, `Parsing experiences data...`, scraperSessionId);
 
+      const rawExperiencesData = await page.evaluate(() => {
+        const experiences = document
+          .querySelector("#experience")
+          ?.nextElementSibling?.nextElementSibling?.querySelectorAll(
+            ".pvs-entity"
+          );
+        let result: RawExperience[] = [];
+
+        // Using a for loop so we can use await inside of it
+        if (experiences) {
+          experiences.forEach((node) => {
+            let title,
+              employmentType,
+              company,
+              description,
+              startDate,
+              endDate,
+              endDateIsPresent,
+              location;
+            let data: Element | NodeListOf<Element> | null =
+              node.querySelectorAll(
+                'div:nth-child(1) div:first-child span[aria-hidden="true"]'
+              );
+            if (data.length >= 3) {
+              // software engineer
+              title = data.item(0).textContent;
+              // company, employment type
+              let temp = data.item(1).textContent;
+              company = temp?.split(" · ")?.[0];
+              employmentType = temp?.split(" · ")?.[1];
+              // date
+              temp = data.item(2).textContent;
+              const startDatePart = temp?.split(" - ")[0] || null;
+              startDate = startDatePart?.trim() || null;
+
+              const endDatePart =
+                temp?.split(" - ")[1]?.split(" · ")[0] || null;
+              endDateIsPresent =
+                endDatePart?.trim().toLowerCase().includes("present") ||
+                endDatePart?.trim() === "현재" ||
+                false;
+              endDate =
+                endDatePart && !endDateIsPresent
+                  ? endDatePart.trim()
+                  : "Present";
+              if (data.length === 4) {
+                // location
+                location = data.item(3).textContent;
+              }
+            }
+            data = node.querySelector(
+              'div:nth-child(1) div:first-child span[aria-hidden="true"]'
+            );
+            if (data) {
+              description = data.innerHTML
+                .replace(/<!---->/gi, "")
+                .replace(/<br(\/)?>/gi, "\n");
+            }
+            result.push({
+              title,
+              company,
+              employmentType,
+              location,
+              startDate,
+              endDate,
+              endDateIsPresent,
+              description,
+            });
+          });
+        }
+
+        return result;
+      });
+      /*
       const rawExperiencesData: RawExperience[] = await page.$$eval(
         "#experience-section ul > .ember-view, #experience-section .pv-entity__position-group-role-item-fading-timeline, #experience-section .pv-entity__position-group-role-item",
         (nodes) => {
@@ -961,7 +1061,7 @@ export class LinkedInProfileScraper {
 
           return data;
         }
-      );
+      );*/
 
       // Convert the raw data to clean data using our utils
       // So we don't have to inject our util methods inside the browser context, which is too damn difficult using TypeScript
@@ -997,6 +1097,13 @@ export class LinkedInProfileScraper {
               "Seasonal",
               "Internship",
               "Apprenticeship",
+              "인턴",
+              "정규직",
+              "계약직",
+              "프리랜서",
+              "자영업",
+              "파트타임",
+              "시즌제",
             ].includes(cleanedEmploymentType)
           ) {
             cleanedEmploymentType = null;
@@ -1024,50 +1131,64 @@ export class LinkedInProfileScraper {
         scraperSessionId
       );
 
-      statusLog(logSection, `Parsing education data...`, scraperSessionId);
+      statusLog(logSection, `Parsing certification data...`, scraperSessionId);
 
-      const rawCertificationData: RawCertification[] = await page.$$eval(
-        "#certifications-section ul > .ember-view",
-        (nodes) => {
+      const rawCertificationData: RawCertification[] = await page.evaluate(
+        () => {
+          const certifications = document
+            .querySelector("#licenses_and_certifications")
+            ?.nextElementSibling?.nextElementSibling?.querySelectorAll(
+              ".pvs-entity"
+            );
+
           // Note: the $$eval context is the browser context.
           // So custom methods you define in this file are not available within this $$eval.
-          let data: RawCertification[] = [];
-          for (const node of nodes) {
-            const nameElement = node.querySelector("h3");
-            const name = nameElement?.textContent || null;
+          let result: RawCertification[] = [];
+          if (certifications) {
+            certifications.forEach((node) => {
+              let name, issuingOrganization, issueDate, expirationDate;
+              let data: Element | NodeListOf<Element> | null =
+                node.querySelectorAll(
+                  'div:nth-child(1) div:first-child span[aria-hidden="true"]'
+                );
+              if (data.length >= 3) {
+                // certification name
+                name = data.item(0).textContent;
+                // issuing organization
+                issuingOrganization = data.item(1).textContent;
+                // date
+                let temp = data
+                  .item(2)
+                  .textContent?.replace(/issued /gi, "")
+                  .replace(/발행일: /gi, "");
+                if (
+                  temp?.includes(" · No Expiration Date") ||
+                  temp?.includes("")
+                ) {
+                  const startDatePart = temp
+                    .replace(" · No Expiration Date", "")
+                    .replace(" · 만료일 없음", "");
+                  issueDate = startDatePart?.trim() || null;
+                  expirationDate = null;
+                } else {
+                  const startDatePart = temp?.split(" - ")[0];
+                  issueDate = startDatePart?.trim() || null;
 
-            const issuingOrganizationElement = node.querySelector(
-              "p span:nth-child(2)"
-            );
-            const issuingOrganization =
-              issuingOrganizationElement?.textContent || null;
-
-            const expirationDateElement = node.querySelector(
-              ".pv-entity__bullet-item-v2"
-            );
-            const expirationDate = expirationDateElement?.textContent || null;
-
-            let issueDate;
-            if (expirationDate) {
-              const issueDateElement = node.querySelectorAll(
-                "p span:not(.pv-entity__bullet-item-v2)"
-              )[3];
-              issueDate =
-                issueDateElement?.textContent?.replace(expirationDate, "") ||
-                null;
-            } else {
-              issueDate = null;
-            }
-
-            data.push({
-              name,
-              issuingOrganization,
-              issueDate,
-              expirationDate,
+                  const endDatePart =
+                    temp?.split(" - ")[1]?.split(" · ")[0] || null;
+                  expirationDate = endDatePart?.trim();
+                }
+              }
+              result.push({
+                name,
+                issueDate,
+                issuingOrganization,
+                expirationDate,
+              });
             });
           }
 
-          return data;
+          return result;
         }
       );
 
@@ -1095,55 +1216,105 @@ export class LinkedInProfileScraper {
 
       statusLog(logSection, `Parsing education data...`, scraperSessionId);
 
-      const rawEducationData: RawEducation[] = await page.$$eval(
-        "#education-section ul > .ember-view",
-        (nodes) => {
-          // Note: the $$eval context is the browser context.
-          // So custom methods you define in this file are not available within this $$eval.
-          let data: RawEducation[] = [];
-          for (const node of nodes) {
-            const schoolNameElement = node.querySelector(
-              "h3.pv-entity__school-name"
+      const rawEducationData: RawEducation[] = await page.evaluate(() => {
+        const educations = document
+          .querySelector("#education")
+          ?.nextElementSibling?.nextElementSibling?.querySelectorAll(
+            ".pvs-entity"
+          );
+
+        // Note: the $$eval context is the browser context.
+        // So custom methods you define in this file are not available within this $$eval.
+        let result: RawEducation[] = [];
+        for (let index = 0; index < (educations?.length || 0); index++) {
+          const node = educations!.item(index);
+
+          let data: Element | NodeListOf<Element> | null =
+            node.querySelectorAll(
+              'div:nth-child(1) div:first-child span[aria-hidden="true"]'
             );
-            const schoolName = schoolNameElement?.textContent || null;
+          let tempElement,
+            degreeName,
+            fieldOfStudy,
+            startDate,
+            endDate,
+            endDateIsPresent,
+            description,
+            schoolName;
+          if (data.length >= 1) {
+            // school name
+            schoolName = data.item(0).textContent;
+            // degree, major
+            if (data.length >= 2) {
+              tempElement = data.item(1).textContent;
+              if (tempElement.includes("20") || tempElement.includes("19")) {
+                // date
+                const startDatePart = tempElement?.split(" - ")[0] || null;
+                startDate = startDatePart?.trim() || null;
 
-            const degreeNameElement = node.querySelector(
-              ".pv-entity__degree-name .pv-entity__comma-item"
-            );
-            const degreeName = degreeNameElement?.textContent || null;
+                const endDatePart =
+                  tempElement?.split(" - ")[1]?.split(" · ")[0] || null;
+                endDateIsPresent =
+                  endDatePart?.trim().toLowerCase() === "present" ||
+                  endDatePart?.trim().toLowerCase() === "현재" ||
+                  false;
+                endDate =
+                  endDatePart && !endDateIsPresent
+                    ? endDatePart.trim()
+                    : "Present";
+              } else {
+                // field
+                const regex =
+                  /(.*)([[전문]?학사|[전문]?석사|박사|Bachelor's degree|Master's degree|PhD|Ph.D|Doctor's degree])/i.exec(
+                    tempElement
+                  );
+                if (!regex) {
+                  fieldOfStudy = tempElement;
+                } else {
+                  fieldOfStudy = regex[1];
+                  degreeName = regex[2];
+                }
+                if (data.length >= 3) {
+                  tempElement = data.item(2).textContent;
+                  // date
+                  const startDatePart = tempElement?.split(" - ")[0] || null;
+                  startDate = startDatePart?.trim() || null;
 
-            const fieldOfStudyElement = node.querySelector(
-              ".pv-entity__fos .pv-entity__comma-item"
-            );
-            const fieldOfStudy = fieldOfStudyElement?.textContent || null;
-
-            // const gradeElement = node.querySelector('.pv-entity__grade .pv-entity__comma-item');
-            // const grade = (gradeElement && gradeElement.textContent) ? window.getCleanText(fieldOfStudyElement.textContent) : null;
-
-            const dateRangeElement = node.querySelectorAll(
-              ".pv-entity__dates time"
-            );
-
-            const startDatePart =
-              (dateRangeElement && dateRangeElement[0]?.textContent) || null;
-            const startDate = startDatePart || null;
-
-            const endDatePart =
-              (dateRangeElement && dateRangeElement[1]?.textContent) || null;
-            const endDate = endDatePart || null;
-
-            data.push({
-              schoolName,
-              degreeName,
-              fieldOfStudy,
-              startDate,
-              endDate,
-            });
+                  const endDatePart =
+                    tempElement?.split(" - ")[1]?.split(" · ")[0] || null;
+                  endDateIsPresent =
+                    endDatePart?.trim().toLowerCase() === "present" ||
+                    endDatePart?.trim().toLowerCase() === "현재" ||
+                    false;
+                  endDate =
+                    endDatePart && !endDateIsPresent
+                      ? endDatePart.trim()
+                      : "Present";
+                }
+              }
+            }
+          }
+          data = node.querySelector(
+            'div:nth-child(1) div:nth-child(1) span[aria-hidden="true"]'
+          );
+          if (data) {
+            description = data.innerHTML
+              .replace(/<!---->/gi, "")
+              .replace(/<br(\/)?>/gi, "\n");
           }
 
-          return data;
+          result.push({
+            schoolName,
+            degreeName,
+            fieldOfStudy,
+            startDate,
+            endDate,
+            description,
+          });
         }
-      );
+
+        return result;
+      });
 
       // Convert the raw data to clean data using our utils
       // So we don't have to inject our util methods inside the browser context, which is too damn difficult using TypeScript
@@ -1252,38 +1423,6 @@ export class LinkedInProfileScraper {
         scraperSessionId
       );
 
-      statusLog(logSection, `Parsing skills data...`, scraperSessionId);
-
-      const skills: Skill[] = await page.$$eval(
-        ".pv-skill-categories-section ol > .ember-view",
-        (nodes) => {
-          // Note: the $$eval context is the browser context.
-          // So custom methods you define in this file are not available within this $$eval.
-
-          return nodes.map((node) => {
-            const skillName = node.querySelector(
-              ".pv-skill-category-entity__name-text"
-            );
-            const endorsementCount = node.querySelector(
-              ".pv-skill-category-entity__endorsement-count"
-            );
-
-            return {
-              skillName: skillName ? skillName.textContent?.trim() : null,
-              endorsementCount: endorsementCount
-                ? parseInt(endorsementCount.textContent?.trim() || "0")
-                : 0,
-            } as Skill;
-          }) as Skill[];
-        }
-      );
-
-      statusLog(
-        logSection,
-        `Got skills data: ${JSON.stringify(skills)}`,
-        scraperSessionId
-      );
-
       statusLog(
         logSection,
         `Parsing organization accomplishments data...`,
@@ -1295,7 +1434,7 @@ export class LinkedInProfileScraper {
 
       if (await page.$(orgAccButton)) {
         await page.click(orgAccButton);
-        await page.waitFor(100);
+        await page.waitForTimeout(100);
       }
 
       const rawOrganizationAccomplishments: RawOrganizationAccomplishments[] =
@@ -1379,35 +1518,44 @@ export class LinkedInProfileScraper {
         'button[aria-label="Expand languages section"][aria-expanded="false"]';
       if (await page.$(langAccButton)) {
         await page.click(langAccButton);
-        await page.waitFor(100);
+        await page.waitForTimeout(100);
       }
 
       const rawLanguageAccomplishments: RawLanguageAccomplishments[] =
-        await page.$$eval(
-          ".pv-profile-section.pv-accomplishments-block.languages ul > li.ember-view",
-          (nodes) => {
-            const data: RawLanguageAccomplishments[] = [];
+        await page.evaluate(() => {
+          const languages = document
+            .querySelector("#languages")
+            ?.nextElementSibling?.nextElementSibling?.querySelectorAll(
+              ".pvs-entity"
+            );
 
-            for (const node of nodes) {
-              const languageElement = node.querySelector(
-                ".pv-accomplishment-entity__title"
+          // Note: the $$eval context is the browser context.
+          // So custom methods you define in this file are not available within this $$eval.
+          let result: RawLanguageAccomplishments[] = [];
+          for (let index = 0; index < (languages?.length || 0); index++) {
+            const node = languages!.item(index);
+
+            let data: Element | NodeListOf<Element> | null =
+              node.querySelectorAll(
+                'div:nth-child(1) div:first-child span[aria-hidden="true"]'
               );
-              const language = languageElement?.textContent || null;
-
-              const proficiencyElement = node.querySelector(
-                ".pv-accomplishment-entity__proficiency"
-              );
-              const proficiency = proficiencyElement?.textContent || null;
-
-              data.push({
-                language: language,
-                proficiency: proficiency,
-              });
+            let language, proficiency;
+            if (data.length >= 1) {
+              // language name
+              language = data.item(0).textContent;
+              if (data.length >= 2) {
+                proficiency = data.item(1).textContent;
+              }
             }
 
-            return data;
+            result.push({
+              language,
+              proficiency,
+            });
           }
-        );
+
+          return result;
+        });
 
       const languageAccomplishments: LanguageAccomplishments[] =
         rawLanguageAccomplishments.map((languageAccomplishment) => {
@@ -1428,35 +1576,76 @@ export class LinkedInProfileScraper {
         'button[aria-label="Expand projects section"][aria-expanded="false"]';
       if (await page.$(projAccButton)) {
         await page.click(projAccButton);
-        await page.waitFor(100);
+        await page.waitForTimeout(100);
       }
 
       const rawProjectAccomplishments: RawProjectAccomplishments[] =
-        await page.$$eval(
-          ".pv-profile-section.pv-accomplishments-block.projects ul > li.ember-view",
-          (nodes) => {
-            const data: RawProjectAccomplishments[] = [];
+        await page.evaluate(() => {
+          const projects = document
+            .querySelector("#projects")
+            ?.nextElementSibling?.nextElementSibling?.querySelectorAll(
+              ".pvs-entity"
+            );
 
-            for (const node of nodes) {
-              const nameElement = node.querySelector(
-                ".pv-accomplishment-entity__title"
+          // Note: the $$eval context is the browser context.
+          // So custom methods you define in this file are not available within this $$eval.
+          let result: RawProjectAccomplishments[] = [];
+          for (let index = 0; index < (projects?.length || 0); index++) {
+            const node = projects!.item(index);
+
+            let data: Element | NodeListOf<Element> | null =
+              node.querySelectorAll(
+                'div:nth-child(1) div:first-child span[aria-hidden="true"]'
               );
-              const name = nameElement?.textContent || null;
+            let name, startDate, endDate, endDateIsPresent, description;
+            if (data.length >= 1) {
+              // language name
+              name = data.item(0).textContent;
+              if (data.length >= 2) {
+                let tempElement = data.item(1).textContent;
+                if (
+                  tempElement?.includes("20") ||
+                  tempElement?.includes("19")
+                ) {
+                  // date
+                  const startDatePart = tempElement.split(" - ")[0] || null;
+                  startDate = startDatePart?.trim() || null;
 
-              const descriptionElement = node.querySelector(
-                ".pv-accomplishment-entity__description"
-              );
-              const description = descriptionElement?.textContent || null;
-
-              data.push({
-                name: name,
-                description: description,
-              });
+                  const endDatePart =
+                    tempElement.split(" - ")[1]?.split(" · ")[0] || null;
+                  endDateIsPresent =
+                    endDatePart?.trim().toLowerCase() === "present" ||
+                    endDatePart?.trim().toLowerCase() === "현재" ||
+                    false;
+                  endDate =
+                    endDatePart && !endDateIsPresent
+                      ? endDatePart.trim()
+                      : "Present";
+                }
+              }
             }
+            try {
+              data = node.querySelector(
+                'div:nth-child(1) div:nth-child(1) span[aria-hidden="true"]'
+              );
+              if (data) {
+                description = data.innerHTML
+                  .replace(/<!---->/gi, "")
+                  .replace(/<br(\/)?>/gi, "\n");
+              }
+            } catch {}
 
-            return data;
+            result.push({
+              name,
+              startDate,
+              endDate,
+              endDateIsPresent,
+              description,
+            });
           }
-        );
+
+          return result;
+        });
 
       const projectAccomplishments: ProjectAccomplishments[] =
         rawProjectAccomplishments.map((projectAccomplishment) => {
@@ -1466,6 +1655,84 @@ export class LinkedInProfileScraper {
             description: getCleanText(projectAccomplishment.description),
           };
         });
+
+      statusLog(logSection, `Parsing skills data...`, scraperSessionId);
+      const seeMoreSelector = await page.evaluate(() => {
+        try {
+          const seeMore = document
+            .querySelector("#skills")
+            ?.nextElementSibling?.nextElementSibling?.querySelector(
+              "div.pvs-list__footer-wrapper a.optional-action-target-wrapper"
+            );
+          if (seeMore) {
+            // in case of see more
+            const skillsElement = document.querySelector("#skills");
+            return `#${
+              skillsElement!.parentElement!.id
+            } .pvs-list__outer-container div.pvs-list__footer-wrapper a.optional-action-target-wrapper`;
+          } else {
+            return null;
+          }
+        } catch (error) {
+          return null;
+        }
+      });
+      let skills: Skill[];
+      if (seeMoreSelector) {
+        await Promise.all([
+          page.waitForNavigation({
+            timeout: this.options.timeout,
+            waitUntil: "domcontentloaded",
+          }),
+          page.click(seeMoreSelector),
+        ]);
+        await page.waitForTimeout(2000);
+        await autoScroll(page);
+        await page.waitForTimeout(500);
+        skills = await page.evaluate(() => {
+          let skills = document
+            .querySelector(".pvs-list")
+            ?.querySelectorAll(
+              `.pvs-entity a[data-field="skill_page_skill_topic"] span[aria-hidden="true"]`
+            );
+          // Note: the $$eval context is the browser context.
+          // So custom methods you define in this file are not available within this $$eval such as statusLog.
+
+          let result: Skill[] = [];
+          for (let index = 0; index < (skills?.length || 0); index++) {
+            result.push({
+              skillName: skills!.item(index)?.textContent?.trim() || null,
+              endorsementCount: 0,
+            } as Skill);
+          }
+          return result;
+        });
+      } else {
+        skills = await page.evaluate(() => {
+          let skills = document
+            .querySelector("#skills")
+            ?.nextElementSibling?.nextElementSibling?.querySelectorAll(
+              `.pvs-entity a[data-field="skill_card_skill_topic"] span[aria-hidden="true"]`
+            );
+          // Note: the $$eval context is the browser context.
+          // So custom methods you define in this file are not available within this $$eval such as statusLog.
+
+          let result: Skill[] = [];
+          for (let index = 0; index < (skills?.length || 0); index++) {
+            result.push({
+              skillName: skills!.item(index)?.textContent?.trim() || null,
+              endorsementCount: 0,
+            } as Skill);
+          }
+          return result;
+        });
+      }
+
+      statusLog(
+        logSection,
+        `Got skills data: ${JSON.stringify(skills)}`,
+        scraperSessionId
+      );
 
       statusLog(
         logSection,
