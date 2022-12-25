@@ -67,7 +67,7 @@ interface RawCertification {
   expirationDate: string | null;
 }
 
-interface Certification {
+export interface Certification {
   name: string | null;
   issuingOrganization: string | null;
   issueDate: string | null;
@@ -112,7 +112,7 @@ export interface VolunteerExperience {
   description: string | null;
 }
 
-export interface RawOrganizationAccomplishments {
+interface RawOrganizationAccomplishments {
   name: string | null;
   position: string | null;
   startDate: string | null;
@@ -131,7 +131,7 @@ export interface OrganizationAccomplishments {
   description: string | null;
 }
 
-export interface RawLanguageAccomplishments {
+interface RawLanguageAccomplishments {
   language: string | null;
   proficiency: string | null;
 }
@@ -141,7 +141,7 @@ export interface LanguageAccomplishments {
   proficiency: string | null;
 }
 
-export interface RawProjectAccomplishments {
+interface RawProjectAccomplishments {
   name: string | null;
   startDate: string | null;
   endDate: string | null;
