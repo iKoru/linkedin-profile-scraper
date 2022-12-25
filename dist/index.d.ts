@@ -23,7 +23,7 @@ export interface Experience {
     durationInDays: number | null;
     description: string | null;
 }
-interface Certification {
+export interface Certification {
     name: string | null;
     issuingOrganization: string | null;
     issueDate: string | null;
@@ -47,14 +47,6 @@ export interface VolunteerExperience {
     durationInDays: number | null;
     description: string | null;
 }
-export interface RawOrganizationAccomplishments {
-    name: string | null;
-    position: string | null;
-    startDate: string | null;
-    endDate: string | null;
-    endDateIsPresent: boolean;
-    description: string | null;
-}
 export interface OrganizationAccomplishments {
     name: string | null;
     position: string | null;
@@ -64,20 +56,9 @@ export interface OrganizationAccomplishments {
     durationInDays: number | null;
     description: string | null;
 }
-export interface RawLanguageAccomplishments {
-    language: string | null;
-    proficiency: string | null;
-}
 export interface LanguageAccomplishments {
     language: string | null;
     proficiency: string | null;
-}
-export interface RawProjectAccomplishments {
-    name: string | null;
-    startDate: string | null;
-    endDate: string | null;
-    endDateIsPresent: boolean;
-    description: string | null;
 }
 export interface ProjectAccomplishments {
     name: string | null;
