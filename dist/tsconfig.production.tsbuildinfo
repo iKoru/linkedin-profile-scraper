@@ -207,8 +207,8 @@
         "affectsGlobalScope": false
       },
       "../src/index.ts": {
-        "version": "cbbc9e016e17900c402b97dcfe8514d23e6d8a795cc434a71ff7a2557b8fa851",
-        "signature": "548fddbe0fb8f5242e47a0b6f33f0836357f09cc605303783e256f7e562a3640",
+        "version": "97096334f2938a2a0bbc361d5a545e7a4083832a77aa0f813c3468e7ecec41fc",
+        "signature": "fb2e8e3704a5547e827e7fa07ff0a116f6ff8a9e8119218418d50f2fbfd33636",
         "affectsGlobalScope": false
       },
       "../src/examples/list-of-urls.ts": {

@@ -277,65 +277,12 @@ class LinkedInProfileScraper {
                     waitUntil: "domcontentloaded",
                     timeout: this.options.timeout,
                 });
-                page.waitForTimeout(1500);
+                yield page.waitForTimeout(3000);
                 utils_1.statusLog(logSection, "LinkedIn profile page loaded!", scraperSessionId);
                 utils_1.statusLog(logSection, "Getting all the LinkedIn profile data by scrolling the page to the bottom, so all the data gets loaded into the page...", scraperSessionId);
                 yield autoScroll(page);
-                page.waitForTimeout(2000);
+                yield page.waitForTimeout(1500);
                 utils_1.statusLog(logSection, "Parsing data...", scraperSessionId);
-                const expandButtonsSelectors = [
-                    ".pvs-list__footer-wrapper .pv-profile-section.pv-about-section .lt-line-clamp__more",
-                    "#experience-section .inline-show-more-text__button.link",
-                    '#experience-section [aria-expanded="false"]',
-                    '#certifications-section [aria-expanded="false"]',
-                    ".pv-profile-section.education-section button.pv-profile-section__see-more-inline",
-                    '[aria-controls="skill-categories-expanded"]',
-                ];
-                const seeMoreButtonsSelectors = [
-                    '.pv-entity__description .lt-line-clamp__line.lt-line-clamp__line--last .lt-line-clamp__more[href="#"]',
-                    ".pv-profile-section__see-more-inline",
-                    ".inline-show-more-text__button",
-                    ".pv-profile-section__see-more-inline.pv-profile-section__text-truncate-toggle.artdeco-button.artdeco-button--tertiary.artdeco-button--muted",
-                    ".pv-entity__paging button.pv-profile-section__see-more-inline",
-                    '#experience-section [aria-expanded="false"]',
-                ];
-                utils_1.statusLog(logSection, 'Expanding all sections by clicking their "See more" buttons', scraperSessionId);
-                for (const buttonSelector of expandButtonsSelectors) {
-                    try {
-                        if ((yield page.$(buttonSelector)) != null) {
-                            utils_1.statusLog(logSection, `Clicking button ${buttonSelector}`, scraperSessionId);
-                            yield page.click(buttonSelector);
-                            yield page.waitForTimeout(100);
-                            if (buttonSelector.startsWith("#certifications-section")) {
-                                while ((yield page.$(buttonSelector)) != null) {
-                                    yield page.click(buttonSelector);
-                                    yield page.waitForTimeout(100);
-                                }
-                            }
-                        }
-                    }
-                    catch (err) {
-                        utils_1.statusLog(logSection, `Could not find or click expand button selector "${buttonSelector}". So we skip that one.`, scraperSessionId);
-                    }
-                }
-                yield page.waitForTimeout(200);
-                utils_1.statusLog(logSection, 'Expanding all descriptions by clicking their "See more" buttons', scraperSessionId);
-                for (const seeMoreButtonSelector of seeMoreButtonsSelectors) {
-                    const buttons = yield page.$$(seeMoreButtonSelector);
-                    for (const button of buttons) {
-                        if (button) {
-                            try {
-                                utils_1.statusLog(logSection, `Clicking button ${seeMoreButtonSelector}`, scraperSessionId);
-                                yield button.click();
-                                yield page.waitForTimeout(100);
-                            }
-                            catch (err) {
-                                utils_1.statusLog(logSection, `Could not find or click see more button selector "${button}". So we skip that one.`, scraperSessionId);
-                            }
-                        }
-                    }
-                }
-                yield page.waitForTimeout(200);
                 utils_1.statusLog(logSection, "Parsing profile data...", scraperSessionId);
                 const rawUserProfileData = yield page.evaluate(() => {
                     var _a, _b, _c, _d;
@@ -504,9 +451,58 @@ class LinkedInProfileScraper {
                     return result;
                 });
                 const certifications = rawCertificationData.map((rawCertification) => {
-                    return Object.assign(Object.assign({}, rawCertification), { name: utils_1.getCleanText(rawCertification.name), issuingOrganization: utils_1.getCleanText(rawCertification.issuingOrganization), issueDate: utils_1.getCleanText(rawCertification.issueDate), expirationDate: utils_1.getCleanText(rawCertification.expirationDate) });
+                    return Object.assign(Object.assign({}, rawCertification), { name: utils_1.getCleanText(rawCertification.name), issuingOrganization: utils_1.getCleanText(rawCertification.issuingOrganization), issueDate: utils_1.formatDate(rawCertification.issueDate), expirationDate: utils_1.formatDate(rawCertification.expirationDate) });
                 });
                 utils_1.statusLog(logSection, `Got certification data: ${JSON.stringify(certifications)}`, scraperSessionId);
+                utils_1.statusLog(logSection, `Parsing award data...`, scraperSessionId);
+                const rawAwardsData = yield page.evaluate(() => {
+                    var _a, _b, _c;
+                    const awards = (_c = (_b = (_a = document
+                        .querySelector("#honors_and_awards")) === null || _a === void 0 ? void 0 : _a.nextElementSibling) === null || _b === void 0 ? void 0 : _b.nextElementSibling) === null || _c === void 0 ? void 0 : _c.querySelectorAll(".pvs-entity");
+                    let result = [];
+                    if (awards) {
+                        awards.forEach((node) => {
+                            let name, issuingOrganization, issueDate, description;
+                            let data = node.querySelectorAll('div:nth-child(1) div:first-child span[aria-hidden="true"]');
+                            if (data.length >= 1) {
+                                name = data.item(0).textContent;
+                                if (data.length >= 2) {
+                                    let temp = data.item(1).textContent;
+                                    if ((temp === null || temp === void 0 ? void 0 : temp.includes("Issued by")) || (temp === null || temp === void 0 ? void 0 : temp.includes("발행: "))) {
+                                        issuingOrganization = temp
+                                            .replace(/Issued by /gi, "")
+                                            .replace(/발행: /gi, "");
+                                        if (issuingOrganization.includes(" · ")) {
+                                            let parse = issuingOrganization.split(" · ");
+                                            issuingOrganization = parse[0];
+                                            issueDate = parse[1];
+                                        }
+                                    }
+                                }
+                                try {
+                                    data = node.querySelector('div:nth-child(1) div:nth-child(1) .pvs-list__outer-container .inline-show-more-text span[aria-hidden="true"]');
+                                    if (data) {
+                                        description = data.innerHTML
+                                            .replace(/<!---->/gi, "")
+                                            .replace(/<br(\/)?>/gi, "\n");
+                                    }
+                                }
+                                catch (_a) { }
+                            }
+                            result.push({
+                                name,
+                                issueDate,
+                                issuingOrganization,
+                                description,
+                            });
+                        });
+                    }
+                    return result;
+                });
+                const awards = rawAwardsData.map((rawAwards) => {
+                    return Object.assign(Object.assign({}, rawAwards), { name: utils_1.getCleanText(rawAwards.name), issuingOrganization: utils_1.getCleanText(rawAwards.issuingOrganization), issueDate: utils_1.formatDate(rawAwards.issueDate), description: utils_1.getCleanText(rawAwards.description) });
+                });
+                utils_1.statusLog(logSection, `Got awards data: ${JSON.stringify(awards)}`, scraperSessionId);
                 utils_1.statusLog(logSection, `Parsing education data...`, scraperSessionId);
                 const rawEducationData = yield page.evaluate(() => {
                     var _a, _b, _c, _d, _e;
@@ -560,12 +556,15 @@ class LinkedInProfileScraper {
                                 }
                             }
                         }
-                        data = node.querySelector('div:nth-child(1) div:nth-child(1) span[aria-hidden="true"]');
-                        if (data) {
-                            description = data.innerHTML
-                                .replace(/<!---->/gi, "")
-                                .replace(/<br(\/)?>/gi, "\n");
+                        try {
+                            data = node.querySelector('div:nth-child(1) div:nth-child(1) span[aria-hidden="true"]');
+                            if (data) {
+                                description = data.innerHTML
+                                    .replace(/<!---->/gi, "")
+                                    .replace(/<br(\/)?>/gi, "\n");
+                            }
                         }
+                        catch (_f) { }
                         result.push({
                             schoolName,
                             degreeName,
@@ -584,87 +583,6 @@ class LinkedInProfileScraper {
                         endDate, durationInDays: utils_1.getDurationInDays(startDate, endDate) });
                 });
                 utils_1.statusLog(logSection, `Got education data: ${JSON.stringify(education)}`, scraperSessionId);
-                utils_1.statusLog(logSection, `Parsing volunteer experience data...`, scraperSessionId);
-                const rawVolunteerExperiences = yield page.$$eval(".pv-profile-section.volunteering-section ul > li.ember-view", (nodes) => {
-                    let data = [];
-                    for (const node of nodes) {
-                        const titleElement = node.querySelector(".pv-entity__summary-info h3");
-                        const title = (titleElement === null || titleElement === void 0 ? void 0 : titleElement.textContent) || null;
-                        const companyElement = node.querySelector(".pv-entity__summary-info span.pv-entity__secondary-title");
-                        const company = (companyElement === null || companyElement === void 0 ? void 0 : companyElement.textContent) || null;
-                        const dateRangeElement = node.querySelector(".pv-entity__date-range span:nth-child(2)");
-                        const dateRangeText = (dateRangeElement === null || dateRangeElement === void 0 ? void 0 : dateRangeElement.textContent) || null;
-                        const startDatePart = (dateRangeText === null || dateRangeText === void 0 ? void 0 : dateRangeText.split("–")[0]) || null;
-                        const startDate = (startDatePart === null || startDatePart === void 0 ? void 0 : startDatePart.trim()) || null;
-                        const endDatePart = (dateRangeText === null || dateRangeText === void 0 ? void 0 : dateRangeText.split("–")[1]) || null;
-                        const endDateIsPresent = (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim().toLowerCase()) === "present" || false;
-                        const endDate = endDatePart && !endDateIsPresent
-                            ? endDatePart.trim()
-                            : "Present";
-                        const descriptionElement = node.querySelector(".pv-entity__description");
-                        const description = (descriptionElement === null || descriptionElement === void 0 ? void 0 : descriptionElement.textContent) || null;
-                        data.push({
-                            title,
-                            company,
-                            startDate,
-                            endDate,
-                            endDateIsPresent,
-                            description,
-                        });
-                    }
-                    return data;
-                });
-                const volunteerExperiences = rawVolunteerExperiences.map((rawVolunteerExperience) => {
-                    const startDate = utils_1.formatDate(rawVolunteerExperience.startDate);
-                    const endDate = utils_1.formatDate(rawVolunteerExperience.endDate);
-                    return Object.assign(Object.assign({}, rawVolunteerExperience), { title: utils_1.getCleanText(rawVolunteerExperience.title), company: utils_1.getCleanText(rawVolunteerExperience.company), description: utils_1.getCleanText(rawVolunteerExperience.description), startDate,
-                        endDate, durationInDays: utils_1.getDurationInDays(startDate, endDate) });
-                });
-                utils_1.statusLog(logSection, `Got volunteer experience data: ${JSON.stringify(volunteerExperiences)}`, scraperSessionId);
-                utils_1.statusLog(logSection, `Parsing organization accomplishments data...`, scraperSessionId);
-                const orgAccButton = 'button[aria-label="Expand organizations section"][aria-expanded="false"]';
-                if (yield page.$(orgAccButton)) {
-                    yield page.click(orgAccButton);
-                    yield page.waitForTimeout(100);
-                }
-                const rawOrganizationAccomplishments = yield page.$$eval(".pv-profile-section.pv-accomplishments-block.organizations ul > li.ember-view", (nodes) => {
-                    var _a, _b, _c, _d, _e;
-                    const data = [];
-                    for (const node of nodes) {
-                        const nameElement = node.querySelector(".pv-accomplishment-entity__title");
-                        const name = (nameElement === null || nameElement === void 0 ? void 0 : nameElement.textContent) || null;
-                        const positionElement = node.querySelector(".pv-accomplishment-entity__position");
-                        const position = (positionElement === null || positionElement === void 0 ? void 0 : positionElement.textContent) || null;
-                        const dateRangeElement = node.querySelector(".pv-accomplishment-entity__date");
-                        const dateRange = ((_a = dateRangeElement === null || dateRangeElement === void 0 ? void 0 : dateRangeElement.textContent) === null || _a === void 0 ? void 0 : _a.replace(/\s*\n\s*/gm, "")) ||
-                            null;
-                        const startDate = ((_c = (_b = dateRange === null || dateRange === void 0 ? void 0 : dateRange.split(/-|–/)) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.trim()) || null;
-                        const endDate = ((_e = (_d = dateRange === null || dateRange === void 0 ? void 0 : dateRange.split(/-|–/)) === null || _d === void 0 ? void 0 : _d[1]) === null || _e === void 0 ? void 0 : _e.trim()) || null;
-                        const endDateIsPresent = (endDate === null || endDate === void 0 ? void 0 : endDate.toLowerCase()) === "present" || false;
-                        const descriptionElement = node.querySelector(".pv-accomplishment-entity__description");
-                        const description = (descriptionElement === null || descriptionElement === void 0 ? void 0 : descriptionElement.textContent) || null;
-                        data.push({
-                            name: name,
-                            position: position,
-                            startDate: startDate,
-                            endDate: endDate,
-                            endDateIsPresent: endDateIsPresent,
-                            description: description,
-                        });
-                    }
-                    return data;
-                });
-                const organizationAccomplishments = rawOrganizationAccomplishments.map((rawOrganizationAccomplishment) => {
-                    const startDate = utils_1.formatDate(utils_1.getCleanText(rawOrganizationAccomplishment.startDate));
-                    const endDate = utils_1.formatDate(utils_1.getCleanText(rawOrganizationAccomplishment.endDate));
-                    return Object.assign(Object.assign({}, rawOrganizationAccomplishment), { name: utils_1.getCleanText(rawOrganizationAccomplishment.name), position: utils_1.getCleanText(rawOrganizationAccomplishment.position), description: utils_1.getCleanText(rawOrganizationAccomplishment.description), startDate: startDate, endDate: endDate, durationInDays: utils_1.getDurationInDays(startDate, endDate) });
-                });
-                utils_1.statusLog(logSection, `Parsing language accomplishments data...`, scraperSessionId);
-                const langAccButton = 'button[aria-label="Expand languages section"][aria-expanded="false"]';
-                if (yield page.$(langAccButton)) {
-                    yield page.click(langAccButton);
-                    yield page.waitForTimeout(100);
-                }
                 const rawLanguageAccomplishments = yield page.evaluate(() => {
                     var _a, _b, _c;
                     const languages = (_c = (_b = (_a = document
@@ -691,11 +609,6 @@ class LinkedInProfileScraper {
                     return Object.assign(Object.assign({}, languageAccomplishment), { language: utils_1.getCleanText(languageAccomplishment.language), proficiency: utils_1.getCleanText(languageAccomplishment.proficiency) });
                 });
                 utils_1.statusLog(logSection, `Parsing project accomplishments data...`, scraperSessionId);
-                const projAccButton = 'button[aria-label="Expand projects section"][aria-expanded="false"]';
-                if (yield page.$(projAccButton)) {
-                    yield page.click(projAccButton);
-                    yield page.waitForTimeout(100);
-                }
                 const rawProjectAccomplishments = yield page.evaluate(() => {
                     var _a, _b, _c, _d;
                     const projects = (_c = (_b = (_a = document
@@ -821,11 +734,12 @@ class LinkedInProfileScraper {
                     experiences,
                     certifications,
                     education,
-                    volunteerExperiences,
+                    volunteerExperiences: [],
                     skills,
-                    organizationAccomplishments,
+                    organizationAccomplishments: [],
                     languageAccomplishments,
                     projectAccomplishments,
+                    awards,
                 };
             }
             catch (err) {

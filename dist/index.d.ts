@@ -29,6 +29,12 @@ export interface Certification {
     issueDate: string | null;
     expirationDate: string | null;
 }
+export interface Award {
+    name: string | null;
+    issuingOrganization: string | null;
+    issueDate: string | null;
+    description: string | null;
+}
 export interface Education {
     schoolName: string | null;
     degreeName: string | null;
@@ -104,11 +110,12 @@ export declare class LinkedInProfileScraper {
         experiences: Experience[];
         certifications: Certification[];
         education: Education[];
-        volunteerExperiences: VolunteerExperience[];
+        volunteerExperiences: never[];
         skills: Skill[];
-        organizationAccomplishments: OrganizationAccomplishments[];
+        organizationAccomplishments: never[];
         languageAccomplishments: LanguageAccomplishments[];
         projectAccomplishments: ProjectAccomplishments[];
+        awards: Award[];
     }>;
 }
 export {};
