@@ -51,56 +51,12 @@ class LinkedInProfileScraper {
                     headless: this.options.headless,
                     executablePath: this.options.executablePath,
                     defaultViewport: this.options.defaultViewport,
-                    pipe: true,
                     args: [
-                        ...(this.options.headless
-                            ? "---single-process"
-                            : "---start-maximized"),
+                        ...chromium_1.default.args,
+                        this.options.headless ? "---single-process" : "---start-maximized",
                         "--no-sandbox",
-                        "--disable-setuid-sandbox",
-                        "--proxy-server='direct://",
-                        "--proxy-bypass-list=*",
-                        "--disable-dev-shm-usage",
-                        "--disable-accelerated-2d-canvas",
                         "--disable-gpu",
-                        "--disable-features=site-per-process",
-                        "--enable-features=NetworkService",
-                        "--allow-running-insecure-content",
-                        "--enable-automation",
-                        "--disable-background-timer-throttling",
-                        "--disable-backgrounding-occluded-windows",
-                        "--disable-renderer-backgrounding",
-                        "--disable-web-security",
-                        "--autoplay-policy=user-gesture-required",
-                        "--disable-background-networking",
-                        "--disable-breakpad",
-                        "--disable-client-side-phishing-detection",
-                        "--disable-component-update",
-                        "--disable-default-apps",
-                        "--disable-domain-reliability",
-                        "--disable-extensions",
-                        "--disable-features=AudioServiceOutOfProcess",
-                        "--disable-hang-monitor",
-                        "--disable-ipc-flooding-protection",
-                        "--disable-notifications",
-                        "--disable-offer-store-unmasked-wallet-cards",
-                        "--disable-popup-blocking",
-                        "--disable-print-preview",
-                        "--disable-prompt-on-repost",
-                        "--disable-speech-api",
-                        "--disable-sync",
-                        "--disk-cache-size=33554432",
-                        "--hide-scrollbars",
-                        "--ignore-gpu-blacklist",
-                        "--metrics-recording-only",
-                        "--mute-audio",
-                        "--no-default-browser-check",
-                        "--no-first-run",
-                        "--no-pings",
-                        "--no-zygote",
-                        "--password-store=basic",
-                        "--use-gl=swiftshader",
-                        "--use-mock-keychain",
+                        "--disable-setuid-sandbox",
                         "--lang=ko-KR,ko",
                     ],
                     timeout: this.options.timeout,
@@ -135,21 +91,21 @@ class LinkedInProfileScraper {
                 "imageset",
             ];
             try {
-                utils_1.statusLog(logSection, `create new page`);
-                const page = yield this.browser.newPage();
-                utils_1.statusLog(logSection, `created new page`);
-                const firstPage = (yield this.browser.pages())[0];
-                yield firstPage.close();
-                utils_1.statusLog(logSection, `closed first page`);
-                const session = yield page.target().createCDPSession();
+                const session = yield this.browser.target().createCDPSession();
                 utils_1.statusLog(logSection, `created cdp session`);
-                yield page.setBypassCSP(true);
                 utils_1.statusLog(logSection, `set bypass csp`);
                 yield session.send("Page.enable");
                 utils_1.statusLog(logSection, `set page enable`);
                 yield session.send("Page.setWebLifecycleState", {
                     state: "active",
                 });
+                utils_1.statusLog(logSection, `create new page`);
+                const page = yield this.browser.newPage();
+                utils_1.statusLog(logSection, `created new page`);
+                yield page.setBypassCSP(true);
+                const firstPage = (yield this.browser.pages())[0];
+                yield firstPage.close();
+                utils_1.statusLog(logSection, `closed first page`);
                 utils_1.statusLog(logSection, `Blocking the following resources: ${blockedResources.join(", ")}`);
                 const blockedHosts = this.getBlockedHosts();
                 const blockedResourcesByHost = ["script", "xhr", "fetch", "document"];

@@ -349,56 +349,54 @@ export class LinkedInProfileScraper {
         headless: this.options.headless,
         executablePath: this.options.executablePath,
         defaultViewport: this.options.defaultViewport,
-        pipe: true,
         args: [
-          ...(this.options.headless
-            ? "---single-process"
-            : "---start-maximized"),
+          ...chromium.args,
+          this.options.headless ? "---single-process" : "---start-maximized",
           "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--proxy-server='direct://",
-          "--proxy-bypass-list=*",
-          "--disable-dev-shm-usage",
-          "--disable-accelerated-2d-canvas",
           "--disable-gpu",
-          "--disable-features=site-per-process",
-          "--enable-features=NetworkService",
-          "--allow-running-insecure-content",
-          "--enable-automation",
-          "--disable-background-timer-throttling",
-          "--disable-backgrounding-occluded-windows",
-          "--disable-renderer-backgrounding",
-          "--disable-web-security",
-          "--autoplay-policy=user-gesture-required",
-          "--disable-background-networking",
-          "--disable-breakpad",
-          "--disable-client-side-phishing-detection",
-          "--disable-component-update",
-          "--disable-default-apps",
-          "--disable-domain-reliability",
-          "--disable-extensions",
-          "--disable-features=AudioServiceOutOfProcess",
-          "--disable-hang-monitor",
-          "--disable-ipc-flooding-protection",
-          "--disable-notifications",
-          "--disable-offer-store-unmasked-wallet-cards",
-          "--disable-popup-blocking",
-          "--disable-print-preview",
-          "--disable-prompt-on-repost",
-          "--disable-speech-api",
-          "--disable-sync",
-          "--disk-cache-size=33554432",
-          "--hide-scrollbars",
-          "--ignore-gpu-blacklist",
-          "--metrics-recording-only",
-          "--mute-audio",
-          "--no-default-browser-check",
-          "--no-first-run",
-          "--no-pings",
-          "--no-zygote",
-          "--password-store=basic",
-          "--use-gl=swiftshader",
-          "--use-mock-keychain",
+          "--disable-setuid-sandbox",
+          // "--proxy-server='direct://",
+          // "--proxy-bypass-list=*",
+          // "--disable-dev-shm-usage",
+          // "--disable-extensions",
+          // "--disable-accelerated-2d-canvas",
+          // "--disable-features=site-per-process",
+          // "--enable-features=NetworkService",
+          // "--allow-running-insecure-content",
+          // "--enable-automation",
+          // "--disable-background-timer-throttling",
+          // "--disable-backgrounding-occluded-windows",
+          // "--disable-renderer-backgrounding",
+          // "--disable-web-security",
+          // "--autoplay-policy=user-gesture-required",
+          // "--disable-background-networking",
+          // "--disable-breakpad",
+          // "--disable-client-side-phishing-detection",
+          // "--disable-component-update",
+          // "--disable-default-apps",
+          // "--disable-domain-reliability",
+          // "--disable-features=AudioServiceOutOfProcess",
+          // "--disable-hang-monitor",
+          // "--disable-ipc-flooding-protection",
+          // "--disable-notifications",
+          // "--disable-offer-store-unmasked-wallet-cards",
+          // "--disable-popup-blocking",
+          // "--disable-print-preview",
+          // "--disable-prompt-on-repost",
+          // "--disable-speech-api",
+          // "--disable-sync",
+          // "--disk-cache-size=33554432",
+          // "--hide-scrollbars",
+          // "--ignore-gpu-blacklist",
+          // "--metrics-recording-only",
+          // "--mute-audio",
+          // "--no-default-browser-check",
+          // "--no-first-run",
+          // "--no-pings",
+          // "--no-zygote",
+          // "--password-store=basic",
+          // "--use-gl=egl",
+          // "--use-mock-keychain",
           "--lang=ko-KR,ko",
         ],
         timeout: this.options.timeout,
@@ -447,25 +445,25 @@ export class LinkedInProfileScraper {
     ]; // not blocking image since we want profile pics
 
     try {
-      statusLog(logSection, `create new page`);
-      const page = await this.browser.newPage();
-      statusLog(logSection, `created new page`);
-      // Use already open page
-      // This makes sure we don't have an extra open tab consuming memory
-      const firstPage = (await this.browser.pages())[0];
-      await firstPage.close();
-      statusLog(logSection, `closed first page`);
-      // Method to create a faster Page
+      const session = await this.browser.target().createCDPSession();
       // From: https://github.com/shirshak55/scrapper-tools/blob/master/src/fastPage/index.ts#L113
-      const session = await page.target().createCDPSession();
       statusLog(logSection, `created cdp session`);
-      await page.setBypassCSP(true);
       statusLog(logSection, `set bypass csp`);
       await session.send("Page.enable");
       statusLog(logSection, `set page enable`);
       await session.send("Page.setWebLifecycleState", {
         state: "active",
       });
+      statusLog(logSection, `create new page`);
+      const page = await this.browser.newPage();
+      statusLog(logSection, `created new page`);
+      await page.setBypassCSP(true);
+      // Use already open page
+      // This makes sure we don't have an extra open tab consuming memory
+      const firstPage = (await this.browser.pages())[0];
+      await firstPage.close();
+      statusLog(logSection, `closed first page`);
+      // Method to create a faster Page
 
       statusLog(
         logSection,
