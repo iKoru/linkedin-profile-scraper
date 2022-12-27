@@ -344,17 +344,16 @@ export class LinkedInProfileScraper {
           this.options.headless ? "background" : "foreground"
         }...`
       );
-
       this.browser = await puppeteer.launch({
         headless: this.options.headless,
         executablePath: this.options.executablePath,
         defaultViewport: this.options.defaultViewport,
         args: [
           ...chromium.args,
-          this.options.headless ? "---single-process" : "---start-maximized",
-          "--no-sandbox",
-          "--disable-gpu",
-          "--disable-setuid-sandbox",
+          // this.options.headless ? "---single-process" : "---start-maximized",
+          // "--no-sandbox",
+          // "--disable-gpu",
+          // "--disable-setuid-sandbox",
           // "--proxy-server='direct://",
           // "--proxy-bypass-list=*",
           // "--disable-dev-shm-usage",
@@ -398,6 +397,7 @@ export class LinkedInProfileScraper {
           // "--use-gl=egl",
           // "--use-mock-keychain",
           "--lang=ko-KR,ko",
+          "--accept-lang=ko-KR",
         ],
         timeout: this.options.timeout,
       });

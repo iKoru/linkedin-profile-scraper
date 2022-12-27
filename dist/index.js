@@ -53,11 +53,8 @@ class LinkedInProfileScraper {
                     defaultViewport: this.options.defaultViewport,
                     args: [
                         ...chromium_1.default.args,
-                        this.options.headless ? "---single-process" : "---start-maximized",
-                        "--no-sandbox",
-                        "--disable-gpu",
-                        "--disable-setuid-sandbox",
                         "--lang=ko-KR,ko",
+                        "--accept-lang=ko-KR",
                     ],
                     timeout: this.options.timeout,
                 });
