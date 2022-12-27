@@ -134,12 +134,18 @@ class LinkedInProfileScraper {
                 "imageset",
             ];
             try {
+                utils_1.statusLog(logSection, `create new page`);
                 const page = yield this.browser.newPage();
+                utils_1.statusLog(logSection, `created new page`);
                 const firstPage = (yield this.browser.pages())[0];
                 yield firstPage.close();
+                utils_1.statusLog(logSection, `closed first page`);
                 const session = yield page.target().createCDPSession();
+                utils_1.statusLog(logSection, `created cdp session`);
                 yield page.setBypassCSP(true);
+                utils_1.statusLog(logSection, `set bypass csp`);
                 yield session.send("Page.enable");
+                utils_1.statusLog(logSection, `set page enable`);
                 yield session.send("Page.setWebLifecycleState", {
                     state: "active",
                 });
@@ -166,7 +172,9 @@ class LinkedInProfileScraper {
                     }
                     return req.continue();
                 });
+                utils_1.statusLog(logSection, `set request interceptor`);
                 yield page.setUserAgent(this.options.userAgent);
+                utils_1.statusLog(logSection, `set user agent`);
                 yield page.setViewport({
                     width: 1200,
                     height: 720,
