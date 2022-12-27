@@ -88,21 +88,21 @@ class LinkedInProfileScraper {
                 "imageset",
             ];
             try {
-                const session = yield this.browser.target().createCDPSession();
+                utils_1.statusLog(logSection, `create new page`);
+                const page = yield this.browser.newPage();
+                utils_1.statusLog(logSection, `created new page`);
+                const firstPage = (yield this.browser.pages())[0];
+                yield firstPage.close();
+                utils_1.statusLog(logSection, `closed first page`);
+                const session = yield page.target().createCDPSession();
                 utils_1.statusLog(logSection, `created cdp session`);
+                yield page.setBypassCSP(true);
                 utils_1.statusLog(logSection, `set bypass csp`);
                 yield session.send("Page.enable");
                 utils_1.statusLog(logSection, `set page enable`);
                 yield session.send("Page.setWebLifecycleState", {
                     state: "active",
                 });
-                utils_1.statusLog(logSection, `create new page`);
-                const page = yield this.browser.newPage();
-                utils_1.statusLog(logSection, `created new page`);
-                yield page.setBypassCSP(true);
-                const firstPage = (yield this.browser.pages())[0];
-                yield firstPage.close();
-                utils_1.statusLog(logSection, `closed first page`);
                 utils_1.statusLog(logSection, `Blocking the following resources: ${blockedResources.join(", ")}`);
                 const blockedHosts = this.getBlockedHosts();
                 const blockedResourcesByHost = ["script", "xhr", "fetch", "document"];

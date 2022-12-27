@@ -445,25 +445,25 @@ export class LinkedInProfileScraper {
     ]; // not blocking image since we want profile pics
 
     try {
-      const session = await this.browser.target().createCDPSession();
-      // From: https://github.com/shirshak55/scrapper-tools/blob/master/src/fastPage/index.ts#L113
-      statusLog(logSection, `created cdp session`);
-      statusLog(logSection, `set bypass csp`);
-      await session.send("Page.enable");
-      statusLog(logSection, `set page enable`);
-      await session.send("Page.setWebLifecycleState", {
-        state: "active",
-      });
       statusLog(logSection, `create new page`);
       const page = await this.browser.newPage();
       statusLog(logSection, `created new page`);
-      await page.setBypassCSP(true);
       // Use already open page
       // This makes sure we don't have an extra open tab consuming memory
       const firstPage = (await this.browser.pages())[0];
       await firstPage.close();
       statusLog(logSection, `closed first page`);
       // Method to create a faster Page
+      // From: https://github.com/shirshak55/scrapper-tools/blob/master/src/fastPage/index.ts#L113
+      const session = await page.target().createCDPSession();
+      statusLog(logSection, `created cdp session`);
+      await page.setBypassCSP(true);
+      statusLog(logSection, `set bypass csp`);
+      await session.send("Page.enable");
+      statusLog(logSection, `set page enable`);
+      await session.send("Page.setWebLifecycleState", {
+        state: "active",
+      });
 
       statusLog(
         logSection,
