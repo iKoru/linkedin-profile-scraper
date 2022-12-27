@@ -1,7 +1,8 @@
-import Chromium from "chrome-aws-lambda";
 import { Browser, Page, Viewport } from "puppeteer-core";
 import treeKill from "tree-kill";
 import blockedHostsList from "./blocked-hosts";
+import chromium from "@sparticuz/chromium";
+import puppeteer from "puppeteer-core";
 
 import { SessionExpired } from "./errors";
 import {
@@ -252,9 +253,9 @@ export class LinkedInProfileScraper {
     timeout: 10000,
     userAgent:
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
-    headless: Chromium.headless,
+    headless: chromium.headless,
     executablePath: null,
-    defaultViewport: Chromium.defaultViewport,
+    defaultViewport: chromium.defaultViewport,
   };
 
   private browser: Browser | null = null;
@@ -335,7 +336,7 @@ export class LinkedInProfileScraper {
 
     try {
       if (!this.options.executablePath) {
-        this.options.executablePath = await Chromium.executablePath;
+        this.options.executablePath = await chromium.executablePath;
       }
       statusLog(
         logSection,
@@ -344,7 +345,7 @@ export class LinkedInProfileScraper {
         }...`
       );
 
-      this.browser = await Chromium.puppeteer.launch({
+      this.browser = await puppeteer.launch({
         headless: this.options.headless,
         executablePath: this.options.executablePath,
         defaultViewport: this.options.defaultViewport,

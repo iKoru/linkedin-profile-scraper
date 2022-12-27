@@ -2,9 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LinkedInProfileScraper = void 0;
 const tslib_1 = require("tslib");
-const chrome_aws_lambda_1 = tslib_1.__importDefault(require("chrome-aws-lambda"));
 const tree_kill_1 = tslib_1.__importDefault(require("tree-kill"));
 const blocked_hosts_1 = tslib_1.__importDefault(require("./blocked-hosts"));
+const chromium_1 = tslib_1.__importDefault(require("@sparticuz/chromium"));
+const puppeteer_core_1 = tslib_1.__importDefault(require("puppeteer-core"));
 const errors_1 = require("./errors");
 const utils_1 = require("./utils");
 function autoScroll(page) {
@@ -33,9 +34,9 @@ class LinkedInProfileScraper {
             keepAlive: false,
             timeout: 10000,
             userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
-            headless: chrome_aws_lambda_1.default.headless,
+            headless: chromium_1.default.headless,
             executablePath: null,
-            defaultViewport: chrome_aws_lambda_1.default.defaultViewport,
+            defaultViewport: chromium_1.default.defaultViewport,
         };
         this.browser = null;
         this.launched = false;
@@ -43,10 +44,10 @@ class LinkedInProfileScraper {
             const logSection = "setup";
             try {
                 if (!this.options.executablePath) {
-                    this.options.executablePath = yield chrome_aws_lambda_1.default.executablePath;
+                    this.options.executablePath = yield chromium_1.default.executablePath;
                 }
                 utils_1.statusLog(logSection, `Launching puppeteer in the ${this.options.headless ? "background" : "foreground"}...`);
-                this.browser = yield chrome_aws_lambda_1.default.puppeteer.launch({
+                this.browser = yield puppeteer_core_1.default.launch({
                     headless: this.options.headless,
                     executablePath: this.options.executablePath,
                     defaultViewport: this.options.defaultViewport,

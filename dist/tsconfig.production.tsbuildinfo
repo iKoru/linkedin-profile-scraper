@@ -156,71 +156,6 @@
         "signature": "4745ef5a44003882e6ca2b30c838ce5b59dbf2c170e672b62e6fd088347b7057",
         "affectsGlobalScope": false
       },
-      "../node_modules/devtools-protocol/types/protocol.d.ts": {
-        "version": "048f50361b3948e92aca0148d6a7c566843164830c1aa70962179052f576479c",
-        "signature": "048f50361b3948e92aca0148d6a7c566843164830c1aa70962179052f576479c",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/devtools-protocol/types/protocol-mapping.d.ts": {
-        "version": "6d18352a53bff1aae48a9dd3b7111c442b41992354be6b6bcb24749bb9a02ddf",
-        "signature": "6d18352a53bff1aae48a9dd3b7111c442b41992354be6b6bcb24749bb9a02ddf",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/puppeteer-core/lib/types.d.ts": {
-        "version": "c81e051c9a85bb7e97b6b90465fcf8e89369d6c5df0a2a0f31694c75faab151c",
-        "signature": "c81e051c9a85bb7e97b6b90465fcf8e89369d6c5df0a2a0f31694c75faab151c",
-        "affectsGlobalScope": true
-      },
-      "../node_modules/chrome-aws-lambda/typings/chrome-aws-lambda.d.ts": {
-        "version": "33fcab9da3566d329c6fa57fe8534329bc4f9caf29ed68976c3433eed3922727",
-        "signature": "33fcab9da3566d329c6fa57fe8534329bc4f9caf29ed68976c3433eed3922727",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/chrome-aws-lambda/build/index.d.ts": {
-        "version": "e8376775255c45e52b7381ed7aa78c83d5231c9313475d35f2afe9836762690e",
-        "signature": "e8376775255c45e52b7381ed7aa78c83d5231c9313475d35f2afe9836762690e",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/tree-kill/index.d.ts": {
-        "version": "8323e3f5b91261ed250bd7c6b7aba2aa10f8e1c2ef348297c1f7752a403abebd",
-        "signature": "8323e3f5b91261ed250bd7c6b7aba2aa10f8e1c2ef348297c1f7752a403abebd",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/moment/ts3.1-typings/moment.d.ts": {
-        "version": "4051f6311deb0ce6052329eeb1cd4b1b104378fe52f882f483130bea75f92197",
-        "signature": "4051f6311deb0ce6052329eeb1cd4b1b104378fe52f882f483130bea75f92197",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/moment-timezone/index.d.ts": {
-        "version": "75b4df517570229d59a1951e1f283e17f232b8c1df8cb675f1bbb127da208e2e",
-        "signature": "75b4df517570229d59a1951e1f283e17f232b8c1df8cb675f1bbb127da208e2e",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/i18n-iso-countries/index.d.ts": {
-        "version": "d399ec13a81b9587f96833daf4d03dfbbbae1dfa078a9ecd523ee584899b72c3",
-        "signature": "d399ec13a81b9587f96833daf4d03dfbbbae1dfa078a9ecd523ee584899b72c3",
-        "affectsGlobalScope": false
-      },
-      "../src/utils/index.ts": {
-        "version": "6507f78812ceea77a705933acff046a736d928ac76ed29a62f79f5f1ecf95361",
-        "signature": "6f5321c204d88cf19e2659207fdf269fc56c6e24ee254885d1236fd48e10d57a",
-        "affectsGlobalScope": false
-      },
-      "../src/index.ts": {
-        "version": "97096334f2938a2a0bbc361d5a545e7a4083832a77aa0f813c3468e7ecec41fc",
-        "signature": "fb2e8e3704a5547e827e7fa07ff0a116f6ff8a9e8119218418d50f2fbfd33636",
-        "affectsGlobalScope": false
-      },
-      "../src/examples/list-of-urls.ts": {
-        "version": "df8183db58e63754b49b18196b22e021ec6e29cd87a9f275be389f368e36ab5e",
-        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
-        "affectsGlobalScope": false
-      },
-      "../src/examples/module.ts": {
-        "version": "b3387ad5b8526e73c70f2405085ea1fad7fece26aab29075960bc688b74e8c12",
-        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
-        "affectsGlobalScope": false
-      },
       "../node_modules/@types/node/globals.d.ts": {
         "version": "fae548bb4dd54b5562ba24f95ec6577da578f3d87b6c952bb9d6ebe29237abd0",
         "signature": "fae548bb4dd54b5562ba24f95ec6577da578f3d87b6c952bb9d6ebe29237abd0",
@@ -476,6 +411,66 @@
         "signature": "d522314e80ed71b57e3c2939d3c9594eaae63a4adf028559e6574f6b270b0fee",
         "affectsGlobalScope": false
       },
+      "../node_modules/devtools-protocol/types/protocol.d.ts": {
+        "version": "3a67e93716caba0224b571ecbd2e09fd1cf1515cd5c2f8c6f2a7e0338905a9f8",
+        "signature": "3a67e93716caba0224b571ecbd2e09fd1cf1515cd5c2f8c6f2a7e0338905a9f8",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/devtools-protocol/types/protocol-mapping.d.ts": {
+        "version": "701cfa2bfa4da26a8386c89ffe577d1c968ac94e17e5889eb121fde7cf5e473d",
+        "signature": "701cfa2bfa4da26a8386c89ffe577d1c968ac94e17e5889eb121fde7cf5e473d",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/puppeteer-core/lib/types.d.ts": {
+        "version": "7d48c0b8013cde42e30f7f02131d236fecca51a4179b321f190d4d2e0e618b63",
+        "signature": "7d48c0b8013cde42e30f7f02131d236fecca51a4179b321f190d4d2e0e618b63",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/tree-kill/index.d.ts": {
+        "version": "8323e3f5b91261ed250bd7c6b7aba2aa10f8e1c2ef348297c1f7752a403abebd",
+        "signature": "8323e3f5b91261ed250bd7c6b7aba2aa10f8e1c2ef348297c1f7752a403abebd",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@sparticuz/chromium/build/index.d.ts": {
+        "version": "7a7d37359d29f4e607ef9dda6823a889027e5c2fb3ac0e0f415e0f6c8f23eddc",
+        "signature": "7a7d37359d29f4e607ef9dda6823a889027e5c2fb3ac0e0f415e0f6c8f23eddc",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/moment/ts3.1-typings/moment.d.ts": {
+        "version": "4051f6311deb0ce6052329eeb1cd4b1b104378fe52f882f483130bea75f92197",
+        "signature": "4051f6311deb0ce6052329eeb1cd4b1b104378fe52f882f483130bea75f92197",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/moment-timezone/index.d.ts": {
+        "version": "75b4df517570229d59a1951e1f283e17f232b8c1df8cb675f1bbb127da208e2e",
+        "signature": "75b4df517570229d59a1951e1f283e17f232b8c1df8cb675f1bbb127da208e2e",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/i18n-iso-countries/index.d.ts": {
+        "version": "d399ec13a81b9587f96833daf4d03dfbbbae1dfa078a9ecd523ee584899b72c3",
+        "signature": "d399ec13a81b9587f96833daf4d03dfbbbae1dfa078a9ecd523ee584899b72c3",
+        "affectsGlobalScope": false
+      },
+      "../src/utils/index.ts": {
+        "version": "6507f78812ceea77a705933acff046a736d928ac76ed29a62f79f5f1ecf95361",
+        "signature": "6f5321c204d88cf19e2659207fdf269fc56c6e24ee254885d1236fd48e10d57a",
+        "affectsGlobalScope": false
+      },
+      "../src/index.ts": {
+        "version": "e69c297359d1efe6265504eeeb971df920c2a6cfa7728a6e6248ed9053e38d17",
+        "signature": "fb2e8e3704a5547e827e7fa07ff0a116f6ff8a9e8119218418d50f2fbfd33636",
+        "affectsGlobalScope": false
+      },
+      "../src/examples/list-of-urls.ts": {
+        "version": "df8183db58e63754b49b18196b22e021ec6e29cd87a9f275be389f368e36ab5e",
+        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+        "affectsGlobalScope": false
+      },
+      "../src/examples/module.ts": {
+        "version": "b3387ad5b8526e73c70f2405085ea1fad7fece26aab29075960bc688b74e8c12",
+        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+        "affectsGlobalScope": false
+      },
       "../node_modules/@types/range-parser/index.d.ts": {
         "version": "4e88b833be14c7f384e0dcd57bb30acd799e8e34d212635d693e41a75a71164b",
         "signature": "4e88b833be14c7f384e0dcd57bb30acd799e8e34d212635d693e41a75a71164b",
@@ -621,6 +616,12 @@
       "configFilePath": "../tsconfig.production.json"
     },
     "referencedMap": {
+      "../node_modules/@sparticuz/chromium/build/index.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts"
+      ],
       "../node_modules/@types/body-parser/index.d.ts": [
         "../node_modules/@types/connect/index.d.ts",
         "../node_modules/@types/node/fs.d.ts",
@@ -1104,21 +1105,6 @@
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
       ],
-      "../node_modules/chrome-aws-lambda/build/index.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/chrome-aws-lambda/typings/chrome-aws-lambda.d.ts",
-        "../node_modules/puppeteer-core/lib/types.d.ts"
-      ],
-      "../node_modules/chrome-aws-lambda/typings/chrome-aws-lambda.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/puppeteer-core/lib/types.d.ts"
-      ],
       "../node_modules/devtools-protocol/types/protocol-mapping.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
@@ -1208,6 +1194,7 @@
         "../node_modules/@types/node/stream.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/ts3.7/index.d.ts",
         "../node_modules/@types/node/util.d.ts",
         "../node_modules/devtools-protocol/types/protocol-mapping.d.ts",
         "../node_modules/devtools-protocol/types/protocol.d.ts"
@@ -1427,11 +1414,11 @@
         "../src/index.ts"
       ],
       "../src/index.ts": [
+        "../node_modules/@sparticuz/chromium/build/index.d.ts",
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts",
-        "../node_modules/chrome-aws-lambda/build/index.d.ts",
         "../node_modules/puppeteer-core/lib/types.d.ts",
         "../node_modules/tree-kill/index.d.ts",
         "../src/blocked-hosts.ts",
@@ -1457,6 +1444,12 @@
       ]
     },
     "exportedModulesMap": {
+      "../node_modules/@sparticuz/chromium/build/index.d.ts": [
+        "../node_modules/@types/node/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/util.d.ts"
+      ],
       "../node_modules/@types/body-parser/index.d.ts": [
         "../node_modules/@types/connect/index.d.ts",
         "../node_modules/@types/node/fs.d.ts",
@@ -1940,21 +1933,6 @@
         "../node_modules/@types/node/ts3.2/util.d.ts",
         "../node_modules/@types/node/util.d.ts"
       ],
-      "../node_modules/chrome-aws-lambda/build/index.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/chrome-aws-lambda/typings/chrome-aws-lambda.d.ts",
-        "../node_modules/puppeteer-core/lib/types.d.ts"
-      ],
-      "../node_modules/chrome-aws-lambda/typings/chrome-aws-lambda.d.ts": [
-        "../node_modules/@types/node/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/fs.d.ts",
-        "../node_modules/@types/node/ts3.2/util.d.ts",
-        "../node_modules/@types/node/util.d.ts",
-        "../node_modules/puppeteer-core/lib/types.d.ts"
-      ],
       "../node_modules/devtools-protocol/types/protocol-mapping.d.ts": [
         "../node_modules/@types/node/fs.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
@@ -2044,6 +2022,7 @@
         "../node_modules/@types/node/stream.d.ts",
         "../node_modules/@types/node/ts3.2/fs.d.ts",
         "../node_modules/@types/node/ts3.2/util.d.ts",
+        "../node_modules/@types/node/ts3.7/index.d.ts",
         "../node_modules/@types/node/util.d.ts",
         "../node_modules/devtools-protocol/types/protocol-mapping.d.ts",
         "../node_modules/devtools-protocol/types/protocol.d.ts"
@@ -2244,6 +2223,7 @@
       ]
     },
     "semanticDiagnosticsPerFile": [
+      "../node_modules/@sparticuz/chromium/build/index.d.ts",
       "../node_modules/@types/body-parser/index.d.ts",
       "../node_modules/@types/connect/index.d.ts",
       "../node_modules/@types/express-serve-static-core/index.d.ts",
@@ -2305,8 +2285,6 @@
       "../node_modules/@types/qs/index.d.ts",
       "../node_modules/@types/range-parser/index.d.ts",
       "../node_modules/@types/serve-static/index.d.ts",
-      "../node_modules/chrome-aws-lambda/build/index.d.ts",
-      "../node_modules/chrome-aws-lambda/typings/chrome-aws-lambda.d.ts",
       "../node_modules/devtools-protocol/types/protocol-mapping.d.ts",
       "../node_modules/devtools-protocol/types/protocol.d.ts",
       "../node_modules/i18n-iso-countries/index.d.ts",
