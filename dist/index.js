@@ -51,6 +51,7 @@ class LinkedInProfileScraper {
                     headless: this.options.headless,
                     executablePath: this.options.executablePath,
                     defaultViewport: this.options.defaultViewport,
+                    pipe: true,
                     args: [
                         ...(this.options.headless
                             ? "---single-process"
