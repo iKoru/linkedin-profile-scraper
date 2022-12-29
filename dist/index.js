@@ -88,23 +88,17 @@ class LinkedInProfileScraper {
                 "imageset",
             ];
             try {
-                utils_1.statusLog(logSection, `create new page`);
                 let page = yield this.browser.newPage();
-                utils_1.statusLog(logSection, `created new page`);
                 if (page && (yield this.browser.pages()).length > 1) {
                     const firstPage = (yield this.browser.pages())[0];
                     yield firstPage.close();
-                    utils_1.statusLog(logSection, `closed first page`);
                 }
                 else if (!page) {
                     page = (yield this.browser.pages())[0];
                 }
                 const session = yield page.target().createCDPSession();
-                utils_1.statusLog(logSection, `created cdp session`);
                 yield page.setBypassCSP(true);
-                utils_1.statusLog(logSection, `set bypass csp`);
                 yield session.send("Page.enable");
-                utils_1.statusLog(logSection, `set page enable`);
                 yield session.send("Page.setWebLifecycleState", {
                     state: "active",
                 });
@@ -126,25 +120,20 @@ class LinkedInProfileScraper {
                             .url()
                             .includes("https://www.linkedin.com/realtime/realtimeFrontendClientConnectivityTracking") ||
                         req.url().includes("https://www.linkedin.com/security/csp")) {
-                        utils_1.statusLog("blocked script", `${req.resourceType()}: ${hostname}: ${req.url()}`);
                         return req.abort();
                     }
                     return req.continue();
                 });
-                utils_1.statusLog(logSection, `set request interceptor`);
                 yield page.setUserAgent(this.options.userAgent);
-                utils_1.statusLog(logSection, `set user agent`);
                 yield page.setViewport({
                     width: 1200,
                     height: 720,
                 });
-                utils_1.statusLog(logSection, `Setting session cookie using cookie: ${process.env.LINKEDIN_SESSION_COOKIE_VALUE}`);
                 yield page.setCookie({
                     name: "li_at",
                     value: this.options.sessionCookieValue,
                     domain: ".www.linkedin.com",
                 });
-                utils_1.statusLog(logSection, "Session cookie set!");
                 utils_1.statusLog(logSection, "Done!");
                 return page;
             }
@@ -174,9 +163,7 @@ class LinkedInProfileScraper {
                 this.launched = false;
                 if (page) {
                     try {
-                        utils_1.statusLog(loggerPrefix, "Closing page...");
                         yield page.close();
-                        utils_1.statusLog(loggerPrefix, "Closed page!");
                     }
                     catch (err) {
                         reject(err);
@@ -186,7 +173,6 @@ class LinkedInProfileScraper {
                     try {
                         utils_1.statusLog(loggerPrefix, "Closing browser...");
                         yield this.browser.close();
-                        utils_1.statusLog(loggerPrefix, "Closed browser!");
                         const browserProcessPid = (_a = this.browser.process()) === null || _a === void 0 ? void 0 : _a.pid;
                         if (browserProcessPid) {
                             utils_1.statusLog(loggerPrefix, `Killing browser process pid: ${browserProcessPid}...`);
@@ -246,11 +232,8 @@ class LinkedInProfileScraper {
                     timeout: this.options.timeout,
                 });
                 yield page.waitForTimeout(3000);
-                utils_1.statusLog(logSection, "LinkedIn profile page loaded!", scraperSessionId);
-                utils_1.statusLog(logSection, "Getting all the LinkedIn profile data by scrolling the page to the bottom, so all the data gets loaded into the page...", scraperSessionId);
                 yield autoScroll(page);
                 yield page.waitForTimeout(1500);
-                utils_1.statusLog(logSection, "Parsing data...", scraperSessionId);
                 utils_1.statusLog(logSection, "Parsing profile data...", scraperSessionId);
                 const rawUserProfileData = yield page.evaluate(() => {
                     var _a, _b, _c, _d;
@@ -283,7 +266,6 @@ class LinkedInProfileScraper {
                 const userProfile = Object.assign(Object.assign({}, rawUserProfileData), { fullName: utils_1.getCleanText(rawUserProfileData.fullName), title: utils_1.getCleanText(rawUserProfileData.title), location: rawUserProfileData.location
                         ? utils_1.getLocationFromText(rawUserProfileData.location)
                         : null, description: utils_1.getCleanText(rawUserProfileData.description) });
-                utils_1.statusLog(logSection, `Got user profile data: ${JSON.stringify(userProfile)}`, scraperSessionId);
                 utils_1.statusLog(logSection, `Parsing experiences data...`, scraperSessionId);
                 const rawExperiencesData = yield page.evaluate(() => {
                     var _a, _b, _c;
@@ -376,7 +358,6 @@ class LinkedInProfileScraper {
                         endDateIsPresent,
                         durationInDays, description: utils_1.getCleanText(rawExperience.description) });
                 });
-                utils_1.statusLog(logSection, `Got experiences data: ${JSON.stringify(experiences)}`, scraperSessionId);
                 utils_1.statusLog(logSection, `Parsing certification data...`, scraperSessionId);
                 const rawCertificationData = yield page.evaluate(() => {
                     var _a, _b, _c;
@@ -421,7 +402,6 @@ class LinkedInProfileScraper {
                 const certifications = rawCertificationData.map((rawCertification) => {
                     return Object.assign(Object.assign({}, rawCertification), { name: utils_1.getCleanText(rawCertification.name), issuingOrganization: utils_1.getCleanText(rawCertification.issuingOrganization), issueDate: utils_1.formatDate(rawCertification.issueDate), expirationDate: utils_1.formatDate(rawCertification.expirationDate) });
                 });
-                utils_1.statusLog(logSection, `Got certification data: ${JSON.stringify(certifications)}`, scraperSessionId);
                 utils_1.statusLog(logSection, `Parsing award data...`, scraperSessionId);
                 const rawAwardsData = yield page.evaluate(() => {
                     var _a, _b, _c;
@@ -470,7 +450,6 @@ class LinkedInProfileScraper {
                 const awards = rawAwardsData.map((rawAwards) => {
                     return Object.assign(Object.assign({}, rawAwards), { name: utils_1.getCleanText(rawAwards.name), issuingOrganization: utils_1.getCleanText(rawAwards.issuingOrganization), issueDate: utils_1.formatDate(rawAwards.issueDate), description: utils_1.getCleanText(rawAwards.description) });
                 });
-                utils_1.statusLog(logSection, `Got awards data: ${JSON.stringify(awards)}`, scraperSessionId);
                 utils_1.statusLog(logSection, `Parsing education data...`, scraperSessionId);
                 const rawEducationData = yield page.evaluate(() => {
                     var _a, _b, _c, _d, _e;
@@ -550,7 +529,7 @@ class LinkedInProfileScraper {
                     return Object.assign(Object.assign({}, rawEducation), { schoolName: utils_1.getCleanText(rawEducation.schoolName), degreeName: utils_1.getCleanText(rawEducation.degreeName), fieldOfStudy: utils_1.getCleanText(rawEducation.fieldOfStudy), startDate,
                         endDate, durationInDays: utils_1.getDurationInDays(startDate, endDate) });
                 });
-                utils_1.statusLog(logSection, `Got education data: ${JSON.stringify(education)}`, scraperSessionId);
+                utils_1.statusLog(logSection, `Parsing language accomplishments data...`, scraperSessionId);
                 const rawLanguageAccomplishments = yield page.evaluate(() => {
                     var _a, _b, _c;
                     const languages = (_c = (_b = (_a = document
@@ -686,7 +665,6 @@ class LinkedInProfileScraper {
                         return result;
                     });
                 }
-                utils_1.statusLog(logSection, `Got skills data: ${JSON.stringify(skills)}`, scraperSessionId);
                 utils_1.statusLog(logSection, `Done! Returned profile details for: ${profileUrl}`, scraperSessionId);
                 if (!this.options.keepAlive) {
                     utils_1.statusLog(logSection, "Not keeping the session alive.");
@@ -716,7 +694,6 @@ class LinkedInProfileScraper {
                 throw err;
             }
         });
-        const logSection = "constructing";
         const errorPrefix = "Error during setup.";
         if (!userDefinedOptions.sessionCookieValue) {
             throw new Error(`${errorPrefix} Option "sessionCookieValue" is required.`);
@@ -746,7 +723,6 @@ class LinkedInProfileScraper {
             throw new Error(`${errorPrefix} Option "executablePath" needs to be a string.`);
         }
         this.options = Object.assign(this.options, userDefinedOptions);
-        utils_1.statusLog(logSection, `Using options: ${JSON.stringify(this.options)}`);
     }
 }
 exports.LinkedInProfileScraper = LinkedInProfileScraper;

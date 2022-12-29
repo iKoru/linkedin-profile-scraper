@@ -262,7 +262,6 @@ export class LinkedInProfileScraper {
   private launched: boolean = false;
 
   constructor(userDefinedOptions: ScraperUserDefinedOptions) {
-    const logSection = "constructing";
     const errorPrefix = "Error during setup.";
 
     if (!userDefinedOptions.sessionCookieValue) {
@@ -324,8 +323,6 @@ export class LinkedInProfileScraper {
     }
 
     this.options = Object.assign(this.options, userDefinedOptions);
-
-    statusLog(logSection, `Using options: ${JSON.stringify(this.options)}`);
   }
 
   /**
@@ -445,26 +442,20 @@ export class LinkedInProfileScraper {
     ]; // not blocking image since we want profile pics
 
     try {
-      statusLog(logSection, `create new page`);
       let page = await this.browser.newPage();
-      statusLog(logSection, `created new page`);
       // Use already open page
       // This makes sure we don't have an extra open tab consuming memory
       if (page && (await this.browser.pages()).length > 1) {
         const firstPage = (await this.browser.pages())[0];
         await firstPage.close();
-        statusLog(logSection, `closed first page`);
       } else if (!page) {
         page = (await this.browser.pages())[0];
       }
       // Method to create a faster Page
       // From: https://github.com/shirshak55/scrapper-tools/blob/master/src/fastPage/index.ts#L113
       const session = await page.target().createCDPSession();
-      statusLog(logSection, `created cdp session`);
       await page.setBypassCSP(true);
-      statusLog(logSection, `set bypass csp`);
       await session.send("Page.enable");
-      statusLog(logSection, `set page enable`);
       await session.send("Page.setWebLifecycleState", {
         state: "active",
       });
@@ -510,35 +501,23 @@ export class LinkedInProfileScraper {
             ) ||
           req.url().includes("https://www.linkedin.com/security/csp")
         ) {
-          statusLog(
-            "blocked script",
-            `${req.resourceType()}: ${hostname}: ${req.url()}`
-          );
           return req.abort();
         }
 
         return req.continue();
       });
-      statusLog(logSection, `set request interceptor`);
+
       await page.setUserAgent(this.options.userAgent);
-      statusLog(logSection, `set user agent`);
       await page.setViewport({
         width: 1200,
         height: 720,
       });
-
-      statusLog(
-        logSection,
-        `Setting session cookie using cookie: ${process.env.LINKEDIN_SESSION_COOKIE_VALUE}`
-      );
 
       await page.setCookie({
         name: "li_at",
         value: this.options.sessionCookieValue,
         domain: ".www.linkedin.com",
       });
-
-      statusLog(logSection, "Session cookie set!");
 
       statusLog(logSection, "Done!");
 
@@ -604,9 +583,7 @@ export class LinkedInProfileScraper {
       this.launched = false;
       if (page) {
         try {
-          statusLog(loggerPrefix, "Closing page...");
           await page.close();
-          statusLog(loggerPrefix, "Closed page!");
         } catch (err) {
           reject(err);
         }
@@ -616,7 +593,6 @@ export class LinkedInProfileScraper {
         try {
           statusLog(loggerPrefix, "Closing browser...");
           await this.browser.close();
-          statusLog(loggerPrefix, "Closed browser!");
 
           const browserProcessPid = this.browser.process()?.pid;
 
@@ -722,17 +698,9 @@ export class LinkedInProfileScraper {
         timeout: this.options.timeout,
       });
       await page.waitForTimeout(3000);
-      statusLog(logSection, "LinkedIn profile page loaded!", scraperSessionId);
-
-      statusLog(
-        logSection,
-        "Getting all the LinkedIn profile data by scrolling the page to the bottom, so all the data gets loaded into the page...",
-        scraperSessionId
-      );
 
       await autoScroll(page);
       await page.waitForTimeout(1500);
-      statusLog(logSection, "Parsing data...", scraperSessionId);
 
       statusLog(logSection, "Parsing profile data...", scraperSessionId);
 
@@ -796,12 +764,6 @@ export class LinkedInProfileScraper {
           : null,
         description: getCleanText(rawUserProfileData.description),
       };
-
-      statusLog(
-        logSection,
-        `Got user profile data: ${JSON.stringify(userProfile)}`,
-        scraperSessionId
-      );
 
       statusLog(logSection, `Parsing experiences data...`, scraperSessionId);
 
@@ -1051,12 +1013,6 @@ export class LinkedInProfileScraper {
         }
       );
 
-      statusLog(
-        logSection,
-        `Got experiences data: ${JSON.stringify(experiences)}`,
-        scraperSessionId
-      );
-
       statusLog(logSection, `Parsing certification data...`, scraperSessionId);
 
       const rawCertificationData: RawCertification[] = await page.evaluate(
@@ -1134,12 +1090,6 @@ export class LinkedInProfileScraper {
         }
       );
 
-      statusLog(
-        logSection,
-        `Got certification data: ${JSON.stringify(certifications)}`,
-        scraperSessionId
-      );
-
       statusLog(logSection, `Parsing award data...`, scraperSessionId);
 
       const rawAwardsData: Award[] = await page.evaluate(() => {
@@ -1210,12 +1160,6 @@ export class LinkedInProfileScraper {
           description: getCleanText(rawAwards.description),
         };
       });
-
-      statusLog(
-        logSection,
-        `Got awards data: ${JSON.stringify(awards)}`,
-        scraperSessionId
-      );
 
       statusLog(logSection, `Parsing education data...`, scraperSessionId);
 
@@ -1340,7 +1284,7 @@ export class LinkedInProfileScraper {
 
       statusLog(
         logSection,
-        `Got education data: ${JSON.stringify(education)}`,
+        `Parsing language accomplishments data...`,
         scraperSessionId
       );
 
@@ -1543,12 +1487,6 @@ export class LinkedInProfileScraper {
           return result;
         });
       }
-
-      statusLog(
-        logSection,
-        `Got skills data: ${JSON.stringify(skills)}`,
-        scraperSessionId
-      );
 
       statusLog(
         logSection,
