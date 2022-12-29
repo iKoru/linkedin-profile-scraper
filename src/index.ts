@@ -446,13 +446,17 @@ export class LinkedInProfileScraper {
 
     try {
       statusLog(logSection, `create new page`);
-      const page = await this.browser.newPage();
+      let page = await this.browser.newPage();
       statusLog(logSection, `created new page`);
       // Use already open page
       // This makes sure we don't have an extra open tab consuming memory
-      const firstPage = (await this.browser.pages())[0];
-      await firstPage.close();
-      statusLog(logSection, `closed first page`);
+      if (page && (await this.browser.pages()).length > 1) {
+        const firstPage = (await this.browser.pages())[0];
+        await firstPage.close();
+        statusLog(logSection, `closed first page`);
+      } else if (!page) {
+        page = (await this.browser.pages())[0];
+      }
       // Method to create a faster Page
       // From: https://github.com/shirshak55/scrapper-tools/blob/master/src/fastPage/index.ts#L113
       const session = await page.target().createCDPSession();

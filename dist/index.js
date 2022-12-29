@@ -89,11 +89,16 @@ class LinkedInProfileScraper {
             ];
             try {
                 utils_1.statusLog(logSection, `create new page`);
-                const page = yield this.browser.newPage();
+                let page = yield this.browser.newPage();
                 utils_1.statusLog(logSection, `created new page`);
-                const firstPage = (yield this.browser.pages())[0];
-                yield firstPage.close();
-                utils_1.statusLog(logSection, `closed first page`);
+                if (page && (yield this.browser.pages()).length > 1) {
+                    const firstPage = (yield this.browser.pages())[0];
+                    yield firstPage.close();
+                    utils_1.statusLog(logSection, `closed first page`);
+                }
+                else if (!page) {
+                    page = (yield this.browser.pages())[0];
+                }
                 const session = yield page.target().createCDPSession();
                 utils_1.statusLog(logSection, `created cdp session`);
                 yield page.setBypassCSP(true);
