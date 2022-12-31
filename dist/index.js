@@ -134,6 +134,10 @@ class LinkedInProfileScraper {
                     name: "li_at",
                     value: this.options.sessionCookieValue,
                     domain: ".www.linkedin.com",
+                }, {
+                    name: "lang",
+                    value: '"v=2&lang=ko-kr"',
+                    domain: ".linkedin.com",
                 });
                 utils_1.statusLog(logSection, "Done!");
                 return page;
@@ -279,7 +283,7 @@ class LinkedInProfileScraper {
                         experiences.forEach((node) => {
                             var _a, _b, _c;
                             let title, employmentType, company, description, startDate, endDate, endDateIsPresent, location;
-                            let data = node.querySelectorAll('div:nth-child(1) div:first-child span[aria-hidden="true"]');
+                            let data = node.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
                             if (data.length >= 3) {
                                 title = data.item(0).textContent;
                                 let temp = data.item(1).textContent;
@@ -301,7 +305,7 @@ class LinkedInProfileScraper {
                                     location = data.item(3).textContent;
                                 }
                             }
-                            data = node.querySelector('div:nth-child(1) div:first-child span[aria-hidden="true"]');
+                            data = node.querySelector(':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]');
                             if (data) {
                                 description = data.innerHTML
                                     .replace(/<!---->/gi, "")
@@ -371,7 +375,7 @@ class LinkedInProfileScraper {
                         certifications.forEach((node) => {
                             var _a, _b;
                             let name, issuingOrganization, issueDate, expirationDate;
-                            let data = node.querySelectorAll('div:nth-child(1) div:first-child span[aria-hidden="true"]');
+                            let data = node.querySelectorAll(':scope > div:nth-child(2) > div:nth-child(1) span[aria-hidden="true"]');
                             if (data.length >= 3) {
                                 name = data.item(0).textContent;
                                 issuingOrganization = data.item(1).textContent;
@@ -414,7 +418,7 @@ class LinkedInProfileScraper {
                     if (awards) {
                         awards.forEach((node) => {
                             let name, issuingOrganization, issueDate, description;
-                            let data = node.querySelectorAll('div:nth-child(1) div:first-child span[aria-hidden="true"]');
+                            let data = node.querySelectorAll(':scope > div:nth-child(2) > div:nth-child(1) span[aria-hidden="true"]');
                             if (data.length >= 1) {
                                 name = data.item(0).textContent;
                                 if (data.length >= 2) {
@@ -431,7 +435,7 @@ class LinkedInProfileScraper {
                                     }
                                 }
                                 try {
-                                    data = node.querySelector('div:nth-child(1) div:nth-child(1) .pvs-list__outer-container .inline-show-more-text span[aria-hidden="true"]');
+                                    data = node.querySelector(':scope > div:nth-child(2) > div:nth-child(2) .pvs-list__outer-container .inline-show-more-text span[aria-hidden="true"]');
                                     if (data) {
                                         description = data.innerHTML
                                             .replace(/<!---->/gi, "")
@@ -461,7 +465,7 @@ class LinkedInProfileScraper {
                     let result = [];
                     for (let index = 0; index < ((educations === null || educations === void 0 ? void 0 : educations.length) || 0); index++) {
                         const node = educations.item(index);
-                        let data = node.querySelectorAll('div:nth-child(1) div:first-child span[aria-hidden="true"]');
+                        let data = node.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
                         let tempElement, degreeName, fieldOfStudy, startDate, endDate, endDateIsPresent, description, schoolName;
                         if (data.length >= 1) {
                             schoolName = data.item(0).textContent;
@@ -507,7 +511,7 @@ class LinkedInProfileScraper {
                             }
                         }
                         try {
-                            data = node.querySelector('div:nth-child(1) div:nth-child(1) span[aria-hidden="true"]');
+                            data = node.querySelector(':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]');
                             if (data) {
                                 description = data.innerHTML
                                     .replace(/<!---->/gi, "")
@@ -540,7 +544,7 @@ class LinkedInProfileScraper {
                     let result = [];
                     for (let index = 0; index < ((languages === null || languages === void 0 ? void 0 : languages.length) || 0); index++) {
                         const node = languages.item(index);
-                        let data = node.querySelectorAll('div:nth-child(1) div:first-child span[aria-hidden="true"]');
+                        let data = node.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
                         let language, proficiency;
                         if (data.length >= 1) {
                             language = data.item(0).textContent;
@@ -566,7 +570,7 @@ class LinkedInProfileScraper {
                     let result = [];
                     for (let index = 0; index < ((projects === null || projects === void 0 ? void 0 : projects.length) || 0); index++) {
                         const node = projects.item(index);
-                        let data = node.querySelectorAll('div:nth-child(1) div:first-child span[aria-hidden="true"]');
+                        let data = node.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
                         let name, startDate, endDate, endDateIsPresent, description;
                         if (data.length >= 1) {
                             name = data.item(0).textContent;
@@ -588,7 +592,7 @@ class LinkedInProfileScraper {
                             }
                         }
                         try {
-                            data = node.querySelector('div:nth-child(1) div:nth-child(1) span[aria-hidden="true"]');
+                            data = node.querySelector(':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]');
                             if (data) {
                                 description = data.innerHTML
                                     .replace(/<!---->/gi, "")
