@@ -37,6 +37,7 @@ class LinkedInProfileScraper {
             headless: chromium_1.default.headless,
             executablePath: null,
             defaultViewport: chromium_1.default.defaultViewport,
+            treeKill: true,
         };
         this.browser = null;
         this.launched = false;
@@ -176,13 +177,15 @@ class LinkedInProfileScraper {
                         const browserProcessPid = (_a = this.browser.process()) === null || _a === void 0 ? void 0 : _a.pid;
                         if (browserProcessPid) {
                             utils_1.statusLog(loggerPrefix, `Killing browser process pid: ${browserProcessPid}...`);
-                            tree_kill_1.default(browserProcessPid, "SIGKILL", (err) => {
-                                if (err) {
-                                    return reject(`Failed to kill browser process pid: ${browserProcessPid}`);
-                                }
-                                utils_1.statusLog(loggerPrefix, `Killed browser pid: ${browserProcessPid} Closed browser.`);
-                                resolve();
-                            });
+                            if (this.options.treeKill) {
+                                tree_kill_1.default(browserProcessPid, "SIGKILL", (err) => {
+                                    if (err) {
+                                        return reject(`Failed to kill browser process pid: ${browserProcessPid}`);
+                                    }
+                                    utils_1.statusLog(loggerPrefix, `Killed browser pid: ${browserProcessPid} Closed browser.`);
+                                });
+                            }
+                            resolve();
                         }
                     }
                     catch (err) {
@@ -721,6 +724,10 @@ class LinkedInProfileScraper {
         if (userDefinedOptions.executablePath !== undefined &&
             typeof userDefinedOptions.executablePath !== "string") {
             throw new Error(`${errorPrefix} Option "executablePath" needs to be a string.`);
+        }
+        if (userDefinedOptions.treeKill !== undefined &&
+            typeof userDefinedOptions.treeKill !== "boolean") {
+            throw new Error(`${errorPrefix} Option "treeKill" needs to be a boolean.`);
         }
         this.options = Object.assign(this.options, userDefinedOptions);
     }

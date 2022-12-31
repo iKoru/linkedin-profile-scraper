@@ -84,6 +84,7 @@ interface ScraperUserDefinedOptions {
     timeout?: number;
     headless?: boolean;
     executablePath?: string;
+    treeKill?: boolean;
 }
 interface ScraperOptions {
     sessionCookieValue: string;
@@ -93,6 +94,7 @@ interface ScraperOptions {
     headless: boolean;
     executablePath: string | null;
     defaultViewport: Required<Viewport>;
+    treeKill: boolean;
 }
 export declare class LinkedInProfileScraper {
     readonly options: ScraperOptions;

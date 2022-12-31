@@ -215,6 +215,12 @@ interface ScraperUserDefinedOptions {
    * Default: chromium path
    */
   executablePath?: string;
+  /**
+   * whether treekill when closing
+   *
+   * Default: `true`
+   */
+  treeKill?: boolean;
 }
 
 interface ScraperOptions {
@@ -225,6 +231,7 @@ interface ScraperOptions {
   headless: boolean;
   executablePath: string | null;
   defaultViewport: Required<Viewport>;
+  treeKill: boolean;
 }
 
 async function autoScroll(page: Page) {
@@ -256,6 +263,7 @@ export class LinkedInProfileScraper {
     headless: chromium.headless,
     executablePath: null,
     defaultViewport: chromium.defaultViewport,
+    treeKill: true,
   };
 
   private browser: Browser | null = null;
@@ -319,6 +327,15 @@ export class LinkedInProfileScraper {
     ) {
       throw new Error(
         `${errorPrefix} Option "executablePath" needs to be a string.`
+      );
+    }
+
+    if (
+      userDefinedOptions.treeKill !== undefined &&
+      typeof userDefinedOptions.treeKill !== "boolean"
+    ) {
+      throw new Error(
+        `${errorPrefix} Option "treeKill" needs to be a boolean.`
       );
     }
 
@@ -604,19 +621,21 @@ export class LinkedInProfileScraper {
               `Killing browser process pid: ${browserProcessPid}...`
             );
 
-            treeKill(browserProcessPid, "SIGKILL", (err) => {
-              if (err) {
-                return reject(
-                  `Failed to kill browser process pid: ${browserProcessPid}`
-                );
-              }
+            if (this.options.treeKill) {
+              treeKill(browserProcessPid, "SIGKILL", (err) => {
+                if (err) {
+                  return reject(
+                    `Failed to kill browser process pid: ${browserProcessPid}`
+                  );
+                }
 
-              statusLog(
-                loggerPrefix,
-                `Killed browser pid: ${browserProcessPid} Closed browser.`
-              );
-              resolve();
-            });
+                statusLog(
+                  loggerPrefix,
+                  `Killed browser pid: ${browserProcessPid} Closed browser.`
+                );
+              });
+            }
+            resolve();
           }
         } catch (err) {
           reject(err);
