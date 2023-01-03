@@ -452,7 +452,7 @@
         "affectsGlobalScope": false
       },
       "../src/utils/index.ts": {
-        "version": "6507f78812ceea77a705933acff046a736d928ac76ed29a62f79f5f1ecf95361",
+        "version": "03c997b6f72fac03276bf877be2c7ad5013814716c9133dfab8e622e3898032c",
         "signature": "6f5321c204d88cf19e2659207fdf269fc56c6e24ee254885d1236fd48e10d57a",
         "affectsGlobalScope": false
       },

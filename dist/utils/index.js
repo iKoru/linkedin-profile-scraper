@@ -96,11 +96,9 @@ exports.getLocationFromText = (text) => {
 };
 exports.getCleanText = (text) => {
     const regexRemoveMultipleSpaces = / +/g;
-    const regexRemoveLineBreaks = /(\r\n\t|\n|\r\t)/gm;
     if (!text)
         return null;
     const cleanText = text
-        .replace(regexRemoveLineBreaks, "")
         .replace(regexRemoveMultipleSpaces, " ")
         .replace(/(\.\.\.|…)$/, "")
         .replace(/\s*(see more|see less)\s*$/i, "")
