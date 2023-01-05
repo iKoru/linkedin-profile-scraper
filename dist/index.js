@@ -611,7 +611,7 @@ class LinkedInProfileScraper {
                     return result;
                 });
                 const projectAccomplishments = rawProjectAccomplishments.map((projectAccomplishment) => {
-                    return Object.assign(Object.assign({}, projectAccomplishment), { name: utils_1.getCleanText(projectAccomplishment.name), description: utils_1.getCleanText(projectAccomplishment.description) });
+                    return Object.assign(Object.assign({}, projectAccomplishment), { startDate: utils_1.formatDate(projectAccomplishment.startDate), endDate: utils_1.formatDate(projectAccomplishment.endDate), name: utils_1.getCleanText(projectAccomplishment.name), description: utils_1.getCleanText(projectAccomplishment.description) });
                 });
                 utils_1.statusLog(logSection, `Parsing skills data...`, scraperSessionId);
                 const seeMoreSelector = yield page.evaluate(() => {

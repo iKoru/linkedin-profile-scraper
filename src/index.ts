@@ -1437,6 +1437,8 @@ export class LinkedInProfileScraper {
         rawProjectAccomplishments.map((projectAccomplishment) => {
           return {
             ...projectAccomplishment,
+            startDate: formatDate(projectAccomplishment.startDate),
+            endDate: formatDate(projectAccomplishment.endDate),
             name: getCleanText(projectAccomplishment.name),
             description: getCleanText(projectAccomplishment.description),
           };
