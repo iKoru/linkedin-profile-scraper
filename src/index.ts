@@ -1467,34 +1467,55 @@ export class LinkedInProfileScraper {
       });
       let skills: Skill[];
       if (seeMoreSelector) {
-        await Promise.all([
-          page.waitForNavigation({
-            timeout: this.options.timeout,
-            waitUntil: "domcontentloaded",
-          }),
-          page.click(seeMoreSelector),
-        ]);
-        await page.waitForTimeout(2000);
-        await autoScroll(page);
-        await page.waitForTimeout(500);
-        skills = await page.evaluate(() => {
-          let skills = document
-            .querySelector(".pvs-list")
-            ?.querySelectorAll(
-              `.pvs-entity a[data-field="skill_page_skill_topic"] span[aria-hidden="true"]`
-            );
-          // Note: the $$eval context is the browser context.
-          // So custom methods you define in this file are not available within this $$eval such as statusLog.
+        try {
+          await Promise.all([
+            page.waitForNavigation({
+              timeout: this.options.timeout,
+              waitUntil: "domcontentloaded",
+            }),
+            page.click(seeMoreSelector, {}),
+          ]);
+          await page.waitForTimeout(2000);
+          await autoScroll(page);
+          await page.waitForTimeout(500);
+          skills = await page.evaluate(() => {
+            let skills = document
+              .querySelector(".pvs-list")
+              ?.querySelectorAll(
+                `.pvs-entity a[data-field="skill_page_skill_topic"] span[aria-hidden="true"]`
+              );
+            // Note: the $$eval context is the browser context.
+            // So custom methods you define in this file are not available within this $$eval such as statusLog.
 
-          let result: Skill[] = [];
-          for (let index = 0; index < (skills?.length || 0); index++) {
-            result.push({
-              skillName: skills!.item(index)?.textContent?.trim() || null,
-              endorsementCount: 0,
-            } as Skill);
-          }
-          return result;
-        });
+            let result: Skill[] = [];
+            for (let index = 0; index < (skills?.length || 0); index++) {
+              result.push({
+                skillName: skills!.item(index)?.textContent?.trim() || null,
+                endorsementCount: 0,
+              } as Skill);
+            }
+            return result;
+          });
+        } catch (error) {
+          skills = await page.evaluate(() => {
+            let skills = document
+              .querySelector("#skills")
+              ?.nextElementSibling?.nextElementSibling?.querySelectorAll(
+                `.pvs-entity a[data-field="skill_card_skill_topic"] span[aria-hidden="true"]`
+              );
+            // Note: the $$eval context is the browser context.
+            // So custom methods you define in this file are not available within this $$eval such as statusLog.
+
+            let result: Skill[] = [];
+            for (let index = 0; index < (skills?.length || 0); index++) {
+              result.push({
+                skillName: skills!.item(index)?.textContent?.trim() || null,
+                endorsementCount: 0,
+              } as Skill);
+            }
+            return result;
+          });
+        }
       } else {
         skills = await page.evaluate(() => {
           let skills = document

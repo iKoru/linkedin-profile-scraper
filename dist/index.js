@@ -633,29 +633,46 @@ class LinkedInProfileScraper {
                 });
                 let skills;
                 if (seeMoreSelector) {
-                    yield Promise.all([
-                        page.waitForNavigation({
-                            timeout: this.options.timeout,
-                            waitUntil: "domcontentloaded",
-                        }),
-                        page.click(seeMoreSelector),
-                    ]);
-                    yield page.waitForTimeout(2000);
-                    yield autoScroll(page);
-                    yield page.waitForTimeout(500);
-                    skills = yield page.evaluate(() => {
-                        var _a, _b, _c;
-                        let skills = (_a = document
-                            .querySelector(".pvs-list")) === null || _a === void 0 ? void 0 : _a.querySelectorAll(`.pvs-entity a[data-field="skill_page_skill_topic"] span[aria-hidden="true"]`);
-                        let result = [];
-                        for (let index = 0; index < ((skills === null || skills === void 0 ? void 0 : skills.length) || 0); index++) {
-                            result.push({
-                                skillName: ((_c = (_b = skills.item(index)) === null || _b === void 0 ? void 0 : _b.textContent) === null || _c === void 0 ? void 0 : _c.trim()) || null,
-                                endorsementCount: 0,
-                            });
-                        }
-                        return result;
-                    });
+                    try {
+                        yield Promise.all([
+                            page.waitForNavigation({
+                                timeout: this.options.timeout,
+                                waitUntil: "domcontentloaded",
+                            }),
+                            page.click(seeMoreSelector, {}),
+                        ]);
+                        yield page.waitForTimeout(2000);
+                        yield autoScroll(page);
+                        yield page.waitForTimeout(500);
+                        skills = yield page.evaluate(() => {
+                            var _a, _b, _c;
+                            let skills = (_a = document
+                                .querySelector(".pvs-list")) === null || _a === void 0 ? void 0 : _a.querySelectorAll(`.pvs-entity a[data-field="skill_page_skill_topic"] span[aria-hidden="true"]`);
+                            let result = [];
+                            for (let index = 0; index < ((skills === null || skills === void 0 ? void 0 : skills.length) || 0); index++) {
+                                result.push({
+                                    skillName: ((_c = (_b = skills.item(index)) === null || _b === void 0 ? void 0 : _b.textContent) === null || _c === void 0 ? void 0 : _c.trim()) || null,
+                                    endorsementCount: 0,
+                                });
+                            }
+                            return result;
+                        });
+                    }
+                    catch (error) {
+                        skills = yield page.evaluate(() => {
+                            var _a, _b, _c, _d, _e;
+                            let skills = (_c = (_b = (_a = document
+                                .querySelector("#skills")) === null || _a === void 0 ? void 0 : _a.nextElementSibling) === null || _b === void 0 ? void 0 : _b.nextElementSibling) === null || _c === void 0 ? void 0 : _c.querySelectorAll(`.pvs-entity a[data-field="skill_card_skill_topic"] span[aria-hidden="true"]`);
+                            let result = [];
+                            for (let index = 0; index < ((skills === null || skills === void 0 ? void 0 : skills.length) || 0); index++) {
+                                result.push({
+                                    skillName: ((_e = (_d = skills.item(index)) === null || _d === void 0 ? void 0 : _d.textContent) === null || _e === void 0 ? void 0 : _e.trim()) || null,
+                                    endorsementCount: 0,
+                                });
+                            }
+                            return result;
+                        });
+                    }
                 }
                 else {
                     skills = yield page.evaluate(() => {
