@@ -797,7 +797,7 @@ export class LinkedInProfileScraper {
         const experiences = document
           .querySelector("#experience")
           ?.nextElementSibling?.nextElementSibling?.querySelectorAll(
-            ".pvs-entity"
+            ".pvs-entity.pvs-entity--padded"
           );
         let result: RawExperience[] = [];
 
@@ -812,55 +812,163 @@ export class LinkedInProfileScraper {
               endDate,
               endDateIsPresent,
               location;
-            let data: Element | NodeListOf<Element> | null =
-              node.querySelectorAll(
-                ':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]'
-              );
-            if (data.length >= 3) {
-              // software engineer
-              title = data.item(0).textContent;
-              // company, employment type
-              let temp = data.item(1).textContent;
-              company = temp?.split(" · ")?.[0];
-              employmentType = temp?.split(" · ")?.[1];
-              // date
-              temp = data.item(2).textContent;
-              const startDatePart = temp?.split(" - ")[0] || null;
-              startDate = startDatePart?.trim() || null;
+            if (
+              node.querySelectorAll('a[data-field="experience_company_logo"]')
+                .length > 1
+            ) {
+              // multiple experiences for one company
+              let data: Element | NodeListOf<Element> | null =
+                node.querySelectorAll(
+                  ':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]'
+                );
+              if (data.length > 0) {
+                company = data.item(0).textContent;
+                let detailExperiences = node.querySelectorAll(
+                  ":scope > div:nth-child(2) > div:nth-child(2) div.pvs-entity"
+                );
+                for (let i = 0; i < detailExperiences.length; i++) {
+                  let detailNode = detailExperiences.item(i);
+                  employmentType = null;
+                  title = null;
+                  description = null;
+                  startDate = null;
+                  endDate = null;
+                  endDateIsPresent = null;
+                  location = null;
+                  let detailData: Element | NodeListOf<Element> | null =
+                    detailNode.querySelectorAll(
+                      ':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]'
+                    );
+                  if (detailData.length > 0) {
+                    title = detailData.item(0).textContent;
+                    if (detailData.length > 1) {
+                      let temp = detailData.item(1).textContent;
+                      // date or employment type
+                      if (temp && temp.indexOf(" - ") >= 0) {
+                        // date
+                        const startDatePart = temp?.split(" - ")[0] || null;
+                        startDate = startDatePart?.trim() || null;
 
-              const endDatePart =
-                temp?.split(" - ")[1]?.split(" · ")[0] || null;
-              endDateIsPresent =
-                endDatePart?.trim().toLowerCase().includes("present") ||
-                endDatePart?.trim() === "현재" ||
-                false;
-              endDate =
-                endDatePart && !endDateIsPresent
-                  ? endDatePart.trim()
-                  : "Present";
-              if (data.length === 4) {
-                // location
-                location = data.item(3).textContent;
+                        const endDatePart =
+                          temp?.split(" - ")[1]?.split(" · ")[0] || null;
+                        endDateIsPresent =
+                          endDatePart
+                            ?.trim()
+                            .toLowerCase()
+                            .includes("present") ||
+                          endDatePart?.trim() === "현재" ||
+                          false;
+                        endDate =
+                          endDatePart && !endDateIsPresent
+                            ? endDatePart.trim()
+                            : "Present";
+                      } else {
+                        // employment type
+                        employmentType = temp;
+                      }
+                      if (detailData.length > 2) {
+                        temp = detailData.item(2).textContent;
+                        // date or location
+                        if (temp && temp.indexOf(" - ") >= 0) {
+                          // date
+                          const startDatePart = temp?.split(" - ")[0] || null;
+                          startDate = startDatePart?.trim() || null;
+
+                          const endDatePart =
+                            temp?.split(" - ")[1]?.split(" · ")[0] || null;
+                          endDateIsPresent =
+                            endDatePart
+                              ?.trim()
+                              .toLowerCase()
+                              .includes("present") ||
+                            endDatePart?.trim() === "현재" ||
+                            false;
+                          endDate =
+                            endDatePart && !endDateIsPresent
+                              ? endDatePart.trim()
+                              : "Present";
+                          if (detailData.length > 3) {
+                            location = detailData.item(3).textContent;
+                          }
+                        } else {
+                          // location
+                          location = temp;
+                        }
+                      }
+                    }
+                    detailData = detailNode.querySelector(
+                      ':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]'
+                    );
+                    if (detailData) {
+                      description = detailData.innerHTML
+                        .replace(/<!---->/gi, "")
+                        .replace(/<br(\/)?>/gi, "\n");
+                    }
+                    result.push({
+                      title,
+                      company,
+                      employmentType,
+                      location,
+                      startDate,
+                      endDate,
+                      endDateIsPresent,
+                      description,
+                    });
+                  }
+                }
               }
+            } else {
+              // single experience for one company
+              let data: Element | NodeListOf<Element> | null =
+                node.querySelectorAll(
+                  ':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]'
+                );
+              if (data.length >= 3) {
+                // software engineer
+                title = data.item(0).textContent;
+                // company, employment type
+                let temp = data.item(1).textContent;
+                company = temp?.split(" · ")?.[0];
+                employmentType = temp?.split(" · ")?.[1];
+                // date
+                temp = data.item(2).textContent;
+                const startDatePart = temp?.split(" - ")[0] || null;
+                startDate = startDatePart?.trim() || null;
+
+                const endDatePart =
+                  temp?.split(" - ")[1]?.split(" · ")[0] || null;
+                endDateIsPresent =
+                  endDatePart?.trim().toLowerCase().includes("present") ||
+                  endDatePart?.trim() === "현재" ||
+                  false;
+                endDate =
+                  endDatePart && !endDateIsPresent
+                    ? endDatePart.trim()
+                    : "Present";
+                if (data.length >= 4) {
+                  // location
+                  location = data.item(3).textContent;
+                }
+              }
+              data = node.querySelector(
+                ':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]'
+              );
+              if (data) {
+                description = data.innerHTML
+                  .replace(/<!---->/gi, "")
+                  .replace(/<br(\/)?>/gi, "\n");
+              }
+              result.push({
+                title,
+                company,
+                employmentType,
+                location,
+                startDate,
+                endDate,
+                endDateIsPresent,
+                description,
+              });
             }
-            data = node.querySelector(
-              ':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]'
-            );
-            if (data) {
-              description = data.innerHTML
-                .replace(/<!---->/gi, "")
-                .replace(/<br(\/)?>/gi, "\n");
-            }
-            result.push({
-              title,
-              company,
-              employmentType,
-              location,
-              startDate,
-              endDate,
-              endDateIsPresent,
-              description,
-            });
           });
         }
 

@@ -2,3 +2,4 @@
 node_modules
 coverage
 copy.sh
+.DS_Store
