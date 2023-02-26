@@ -274,57 +274,338 @@ class LinkedInProfileScraper {
                         ? utils_1.getLocationFromText(rawUserProfileData.location)
                         : null, description: utils_1.getCleanText(rawUserProfileData.description) });
                 utils_1.statusLog(logSection, `Parsing experiences data...`, scraperSessionId);
-                const rawExperiencesData = yield page.evaluate(() => {
+                let seeMoreSelector2 = yield page.evaluate(() => {
                     var _a, _b, _c;
-                    const experiences = (_c = (_b = (_a = document
-                        .querySelector("#experience")) === null || _a === void 0 ? void 0 : _a.nextElementSibling) === null || _b === void 0 ? void 0 : _b.nextElementSibling) === null || _c === void 0 ? void 0 : _c.querySelectorAll(".pvs-entity.pvs-entity--padded");
-                    let result = [];
-                    if (experiences) {
-                        experiences.forEach((node) => {
-                            var _a, _b, _c, _d, _e;
-                            let title, employmentType, company, description, startDate, endDate, endDateIsPresent, location;
-                            if (node.querySelectorAll('a[data-field="experience_company_logo"]')
-                                .length > 1) {
-                                let data = node.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
-                                if (data.length > 0) {
-                                    company = data.item(0).textContent;
-                                    let detailExperiences = node.querySelectorAll(":scope > div:nth-child(2) > div:nth-child(2) div.pvs-entity");
-                                    for (let i = 0; i < detailExperiences.length; i++) {
-                                        let detailNode = detailExperiences.item(i);
-                                        employmentType = null;
-                                        title = null;
-                                        description = null;
-                                        startDate = null;
-                                        endDate = null;
-                                        endDateIsPresent = null;
-                                        location = null;
-                                        let detailData = detailNode.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
-                                        if (detailData.length > 0) {
-                                            title = detailData.item(0).textContent;
-                                            if (detailData.length > 1) {
-                                                let temp = detailData.item(1).textContent;
-                                                if (temp && temp.indexOf(" - ") >= 0) {
-                                                    const startDatePart = (temp === null || temp === void 0 ? void 0 : temp.split(" - ")[0]) || null;
-                                                    startDate = (startDatePart === null || startDatePart === void 0 ? void 0 : startDatePart.trim()) || null;
-                                                    const endDatePart = ((_a = temp === null || temp === void 0 ? void 0 : temp.split(" - ")[1]) === null || _a === void 0 ? void 0 : _a.split(" · ")[0]) || null;
-                                                    endDateIsPresent =
-                                                        (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim().toLowerCase().includes("present")) ||
-                                                            (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim()) === "현재" ||
-                                                            false;
-                                                    endDate =
-                                                        endDatePart && !endDateIsPresent
-                                                            ? endDatePart.trim()
-                                                            : "Present";
+                    try {
+                        const seeMore = (_c = (_b = (_a = document
+                            .querySelector("#experience")) === null || _a === void 0 ? void 0 : _a.nextElementSibling) === null || _b === void 0 ? void 0 : _b.nextElementSibling) === null || _c === void 0 ? void 0 : _c.querySelector("div.pvs-list__footer-wrapper a.optional-action-target-wrapper");
+                        if (seeMore) {
+                            const skillsElement = document.querySelector("#experience");
+                            return `#${skillsElement.parentElement.id} .pvs-list__outer-container div.pvs-list__footer-wrapper a.optional-action-target-wrapper`;
+                        }
+                        else {
+                            return null;
+                        }
+                    }
+                    catch (error) {
+                        return null;
+                    }
+                });
+                let rawExperiencesData;
+                if (seeMoreSelector2) {
+                    try {
+                        yield Promise.all([
+                            page.waitForNavigation({
+                                timeout: this.options.timeout,
+                                waitUntil: "domcontentloaded",
+                            }),
+                            page.click(seeMoreSelector2, {}),
+                        ]);
+                        yield page.waitForTimeout(2000);
+                        yield autoScroll(page);
+                        yield page.waitForTimeout(500);
+                        rawExperiencesData = yield page.evaluate(() => {
+                            var _a;
+                            let experiences = (_a = document
+                                .querySelector(".pvs-list")) === null || _a === void 0 ? void 0 : _a.querySelectorAll(`.pvs-list__paged-list-item .pvs-entity.pvs-entity--padded`);
+                            let result = [];
+                            if (experiences) {
+                                experiences.forEach((node) => {
+                                    var _a, _b, _c, _d, _e;
+                                    let title, employmentType, company, description, startDate, endDate, endDateIsPresent, location;
+                                    if (node.querySelectorAll('a[data-field="experience_company_logo"]').length > 1) {
+                                        let data = node.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
+                                        if (data.length > 0) {
+                                            company = data.item(0).textContent;
+                                            let detailExperiences = node.querySelectorAll(":scope > div:nth-child(2) > div:nth-child(2) div.pvs-entity");
+                                            for (let i = 0; i < detailExperiences.length; i++) {
+                                                let detailNode = detailExperiences.item(i);
+                                                employmentType = null;
+                                                title = null;
+                                                description = null;
+                                                startDate = null;
+                                                endDate = null;
+                                                endDateIsPresent = null;
+                                                location = null;
+                                                let detailData = detailNode.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
+                                                if (detailData.length > 0) {
+                                                    title = detailData.item(0).textContent;
+                                                    if (detailData.length > 1) {
+                                                        let temp = detailData.item(1).textContent;
+                                                        if (temp && temp.indexOf(" - ") >= 0) {
+                                                            const startDatePart = (temp === null || temp === void 0 ? void 0 : temp.split(" - ")[0]) || null;
+                                                            startDate = (startDatePart === null || startDatePart === void 0 ? void 0 : startDatePart.trim()) || null;
+                                                            const endDatePart = ((_a = temp === null || temp === void 0 ? void 0 : temp.split(" - ")[1]) === null || _a === void 0 ? void 0 : _a.split(" · ")[0]) || null;
+                                                            endDateIsPresent =
+                                                                (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim().toLowerCase().includes("present")) ||
+                                                                    (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim()) === "현재" ||
+                                                                    false;
+                                                            endDate =
+                                                                endDatePart && !endDateIsPresent
+                                                                    ? endDatePart.trim()
+                                                                    : "Present";
+                                                        }
+                                                        else {
+                                                            employmentType = temp;
+                                                        }
+                                                        if (detailData.length > 2) {
+                                                            temp = detailData.item(2).textContent;
+                                                            if (temp && temp.indexOf(" - ") >= 0) {
+                                                                const startDatePart = (temp === null || temp === void 0 ? void 0 : temp.split(" - ")[0]) || null;
+                                                                startDate = (startDatePart === null || startDatePart === void 0 ? void 0 : startDatePart.trim()) || null;
+                                                                const endDatePart = ((_b = temp === null || temp === void 0 ? void 0 : temp.split(" - ")[1]) === null || _b === void 0 ? void 0 : _b.split(" · ")[0]) || null;
+                                                                endDateIsPresent =
+                                                                    (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim().toLowerCase().includes("present")) ||
+                                                                        (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim()) === "현재" ||
+                                                                        false;
+                                                                endDate =
+                                                                    endDatePart && !endDateIsPresent
+                                                                        ? endDatePart.trim()
+                                                                        : "Present";
+                                                                if (detailData.length > 3) {
+                                                                    location = detailData.item(3).textContent;
+                                                                }
+                                                            }
+                                                            else {
+                                                                location = temp;
+                                                            }
+                                                        }
+                                                    }
+                                                    detailData = detailNode.querySelector(':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]');
+                                                    if (detailData) {
+                                                        description = detailData.innerHTML
+                                                            .replace(/<!---->/gi, "")
+                                                            .replace(/<br(\/)?>/gi, "\n");
+                                                    }
+                                                    result.push({
+                                                        title,
+                                                        company,
+                                                        employmentType,
+                                                        location,
+                                                        startDate,
+                                                        endDate,
+                                                        endDateIsPresent,
+                                                        description,
+                                                    });
                                                 }
-                                                else {
-                                                    employmentType = temp;
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        let data = node.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
+                                        if (data.length >= 3) {
+                                            title = data.item(0).textContent;
+                                            let temp = data.item(1).textContent;
+                                            company = (_c = temp === null || temp === void 0 ? void 0 : temp.split(" · ")) === null || _c === void 0 ? void 0 : _c[0];
+                                            employmentType = (_d = temp === null || temp === void 0 ? void 0 : temp.split(" · ")) === null || _d === void 0 ? void 0 : _d[1];
+                                            temp = data.item(2).textContent;
+                                            const startDatePart = (temp === null || temp === void 0 ? void 0 : temp.split(" - ")[0]) || null;
+                                            startDate = (startDatePart === null || startDatePart === void 0 ? void 0 : startDatePart.trim()) || null;
+                                            const endDatePart = ((_e = temp === null || temp === void 0 ? void 0 : temp.split(" - ")[1]) === null || _e === void 0 ? void 0 : _e.split(" · ")[0]) || null;
+                                            endDateIsPresent =
+                                                (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim().toLowerCase().includes("present")) ||
+                                                    (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim()) === "현재" ||
+                                                    false;
+                                            endDate =
+                                                endDatePart && !endDateIsPresent
+                                                    ? endDatePart.trim()
+                                                    : "Present";
+                                            if (data.length >= 4) {
+                                                location = data.item(3).textContent;
+                                            }
+                                        }
+                                        data = node.querySelector(':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]');
+                                        if (data) {
+                                            description = data.innerHTML
+                                                .replace(/<!---->/gi, "")
+                                                .replace(/<br(\/)?>/gi, "\n");
+                                        }
+                                        result.push({
+                                            title,
+                                            company,
+                                            employmentType,
+                                            location,
+                                            startDate,
+                                            endDate,
+                                            endDateIsPresent,
+                                            description,
+                                        });
+                                    }
+                                });
+                            }
+                            return result;
+                        });
+                        page.goBack();
+                        page.waitForTimeout(200);
+                    }
+                    catch (error) {
+                        rawExperiencesData = yield page.evaluate(() => {
+                            var _a, _b, _c;
+                            const experiences = (_c = (_b = (_a = document
+                                .querySelector("#experience")) === null || _a === void 0 ? void 0 : _a.nextElementSibling) === null || _b === void 0 ? void 0 : _b.nextElementSibling) === null || _c === void 0 ? void 0 : _c.querySelectorAll(".pvs-entity.pvs-entity--padded");
+                            let result = [];
+                            if (experiences) {
+                                experiences.forEach((node) => {
+                                    var _a, _b, _c, _d, _e;
+                                    let title, employmentType, company, description, startDate, endDate, endDateIsPresent, location;
+                                    if (node.querySelectorAll('a[data-field="experience_company_logo"]').length > 1) {
+                                        let data = node.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
+                                        if (data.length > 0) {
+                                            company = data.item(0).textContent;
+                                            let detailExperiences = node.querySelectorAll(":scope > div:nth-child(2) > div:nth-child(2) div.pvs-entity");
+                                            for (let i = 0; i < detailExperiences.length; i++) {
+                                                let detailNode = detailExperiences.item(i);
+                                                employmentType = null;
+                                                title = null;
+                                                description = null;
+                                                startDate = null;
+                                                endDate = null;
+                                                endDateIsPresent = null;
+                                                location = null;
+                                                let detailData = detailNode.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
+                                                if (detailData.length > 0) {
+                                                    title = detailData.item(0).textContent;
+                                                    if (detailData.length > 1) {
+                                                        let temp = detailData.item(1).textContent;
+                                                        if (temp && temp.indexOf(" - ") >= 0) {
+                                                            const startDatePart = (temp === null || temp === void 0 ? void 0 : temp.split(" - ")[0]) || null;
+                                                            startDate = (startDatePart === null || startDatePart === void 0 ? void 0 : startDatePart.trim()) || null;
+                                                            const endDatePart = ((_a = temp === null || temp === void 0 ? void 0 : temp.split(" - ")[1]) === null || _a === void 0 ? void 0 : _a.split(" · ")[0]) || null;
+                                                            endDateIsPresent =
+                                                                (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim().toLowerCase().includes("present")) ||
+                                                                    (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim()) === "현재" ||
+                                                                    false;
+                                                            endDate =
+                                                                endDatePart && !endDateIsPresent
+                                                                    ? endDatePart.trim()
+                                                                    : "Present";
+                                                        }
+                                                        else {
+                                                            employmentType = temp;
+                                                        }
+                                                        if (detailData.length > 2) {
+                                                            temp = detailData.item(2).textContent;
+                                                            if (temp && temp.indexOf(" - ") >= 0) {
+                                                                const startDatePart = (temp === null || temp === void 0 ? void 0 : temp.split(" - ")[0]) || null;
+                                                                startDate = (startDatePart === null || startDatePart === void 0 ? void 0 : startDatePart.trim()) || null;
+                                                                const endDatePart = ((_b = temp === null || temp === void 0 ? void 0 : temp.split(" - ")[1]) === null || _b === void 0 ? void 0 : _b.split(" · ")[0]) || null;
+                                                                endDateIsPresent =
+                                                                    (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim().toLowerCase().includes("present")) ||
+                                                                        (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim()) === "현재" ||
+                                                                        false;
+                                                                endDate =
+                                                                    endDatePart && !endDateIsPresent
+                                                                        ? endDatePart.trim()
+                                                                        : "Present";
+                                                                if (detailData.length > 3) {
+                                                                    location = detailData.item(3).textContent;
+                                                                }
+                                                            }
+                                                            else {
+                                                                location = temp;
+                                                            }
+                                                        }
+                                                    }
+                                                    detailData = detailNode.querySelector(':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]');
+                                                    if (detailData) {
+                                                        description = detailData.innerHTML
+                                                            .replace(/<!---->/gi, "")
+                                                            .replace(/<br(\/)?>/gi, "\n");
+                                                    }
+                                                    result.push({
+                                                        title,
+                                                        company,
+                                                        employmentType,
+                                                        location,
+                                                        startDate,
+                                                        endDate,
+                                                        endDateIsPresent,
+                                                        description,
+                                                    });
                                                 }
-                                                if (detailData.length > 2) {
-                                                    temp = detailData.item(2).textContent;
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        let data = node.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
+                                        if (data.length >= 3) {
+                                            title = data.item(0).textContent;
+                                            let temp = data.item(1).textContent;
+                                            company = (_c = temp === null || temp === void 0 ? void 0 : temp.split(" · ")) === null || _c === void 0 ? void 0 : _c[0];
+                                            employmentType = (_d = temp === null || temp === void 0 ? void 0 : temp.split(" · ")) === null || _d === void 0 ? void 0 : _d[1];
+                                            temp = data.item(2).textContent;
+                                            const startDatePart = (temp === null || temp === void 0 ? void 0 : temp.split(" - ")[0]) || null;
+                                            startDate = (startDatePart === null || startDatePart === void 0 ? void 0 : startDatePart.trim()) || null;
+                                            const endDatePart = ((_e = temp === null || temp === void 0 ? void 0 : temp.split(" - ")[1]) === null || _e === void 0 ? void 0 : _e.split(" · ")[0]) || null;
+                                            endDateIsPresent =
+                                                (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim().toLowerCase().includes("present")) ||
+                                                    (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim()) === "현재" ||
+                                                    false;
+                                            endDate =
+                                                endDatePart && !endDateIsPresent
+                                                    ? endDatePart.trim()
+                                                    : "Present";
+                                            if (data.length >= 4) {
+                                                location = data.item(3).textContent;
+                                            }
+                                        }
+                                        data = node.querySelector(':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]');
+                                        if (data) {
+                                            description = data.innerHTML
+                                                .replace(/<!---->/gi, "")
+                                                .replace(/<br(\/)?>/gi, "\n");
+                                        }
+                                        result.push({
+                                            title,
+                                            company,
+                                            employmentType,
+                                            location,
+                                            startDate,
+                                            endDate,
+                                            endDateIsPresent,
+                                            description,
+                                        });
+                                    }
+                                });
+                            }
+                            return result;
+                        });
+                    }
+                }
+                else {
+                    rawExperiencesData = yield page.evaluate(() => {
+                        var _a, _b, _c;
+                        const experiences = (_c = (_b = (_a = document
+                            .querySelector("#experience")) === null || _a === void 0 ? void 0 : _a.nextElementSibling) === null || _b === void 0 ? void 0 : _b.nextElementSibling) === null || _c === void 0 ? void 0 : _c.querySelectorAll(".pvs-entity.pvs-entity--padded");
+                        let result = [];
+                        if (experiences) {
+                            experiences.forEach((node) => {
+                                var _a, _b, _c, _d, _e;
+                                let title, employmentType, company, description, startDate, endDate, endDateIsPresent, location;
+                                if (node.querySelectorAll('a[data-field="experience_company_logo"]')
+                                    .length > 1) {
+                                    let data = node.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
+                                    if (data.length > 0) {
+                                        company = data.item(0).textContent;
+                                        let detailExperiences = node.querySelectorAll(":scope > div:nth-child(2) > div:nth-child(2) div.pvs-entity");
+                                        for (let i = 0; i < detailExperiences.length; i++) {
+                                            let detailNode = detailExperiences.item(i);
+                                            employmentType = null;
+                                            title = null;
+                                            description = null;
+                                            startDate = null;
+                                            endDate = null;
+                                            endDateIsPresent = null;
+                                            location = null;
+                                            let detailData = detailNode.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
+                                            if (detailData.length > 0) {
+                                                title = detailData.item(0).textContent;
+                                                if (detailData.length > 1) {
+                                                    let temp = detailData.item(1).textContent;
                                                     if (temp && temp.indexOf(" - ") >= 0) {
                                                         const startDatePart = (temp === null || temp === void 0 ? void 0 : temp.split(" - ")[0]) || null;
                                                         startDate = (startDatePart === null || startDatePart === void 0 ? void 0 : startDatePart.trim()) || null;
-                                                        const endDatePart = ((_b = temp === null || temp === void 0 ? void 0 : temp.split(" - ")[1]) === null || _b === void 0 ? void 0 : _b.split(" · ")[0]) || null;
+                                                        const endDatePart = ((_a = temp === null || temp === void 0 ? void 0 : temp.split(" - ")[1]) === null || _a === void 0 ? void 0 : _a.split(" · ")[0]) || null;
                                                         endDateIsPresent =
                                                             (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim().toLowerCase().includes("present")) ||
                                                                 (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim()) === "현재" ||
@@ -333,79 +614,98 @@ class LinkedInProfileScraper {
                                                             endDatePart && !endDateIsPresent
                                                                 ? endDatePart.trim()
                                                                 : "Present";
-                                                        if (detailData.length > 3) {
-                                                            location = detailData.item(3).textContent;
-                                                        }
                                                     }
                                                     else {
-                                                        location = temp;
+                                                        employmentType = temp;
+                                                    }
+                                                    if (detailData.length > 2) {
+                                                        temp = detailData.item(2).textContent;
+                                                        if (temp && temp.indexOf(" - ") >= 0) {
+                                                            const startDatePart = (temp === null || temp === void 0 ? void 0 : temp.split(" - ")[0]) || null;
+                                                            startDate = (startDatePart === null || startDatePart === void 0 ? void 0 : startDatePart.trim()) || null;
+                                                            const endDatePart = ((_b = temp === null || temp === void 0 ? void 0 : temp.split(" - ")[1]) === null || _b === void 0 ? void 0 : _b.split(" · ")[0]) || null;
+                                                            endDateIsPresent =
+                                                                (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim().toLowerCase().includes("present")) ||
+                                                                    (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim()) === "현재" ||
+                                                                    false;
+                                                            endDate =
+                                                                endDatePart && !endDateIsPresent
+                                                                    ? endDatePart.trim()
+                                                                    : "Present";
+                                                            if (detailData.length > 3) {
+                                                                location = detailData.item(3).textContent;
+                                                            }
+                                                        }
+                                                        else {
+                                                            location = temp;
+                                                        }
                                                     }
                                                 }
+                                                detailData = detailNode.querySelector(':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]');
+                                                if (detailData) {
+                                                    description = detailData.innerHTML
+                                                        .replace(/<!---->/gi, "")
+                                                        .replace(/<br(\/)?>/gi, "\n");
+                                                }
+                                                result.push({
+                                                    title,
+                                                    company,
+                                                    employmentType,
+                                                    location,
+                                                    startDate,
+                                                    endDate,
+                                                    endDateIsPresent,
+                                                    description,
+                                                });
                                             }
-                                            detailData = detailNode.querySelector(':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]');
-                                            if (detailData) {
-                                                description = detailData.innerHTML
-                                                    .replace(/<!---->/gi, "")
-                                                    .replace(/<br(\/)?>/gi, "\n");
-                                            }
-                                            result.push({
-                                                title,
-                                                company,
-                                                employmentType,
-                                                location,
-                                                startDate,
-                                                endDate,
-                                                endDateIsPresent,
-                                                description,
-                                            });
                                         }
                                     }
                                 }
-                            }
-                            else {
-                                let data = node.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
-                                if (data.length >= 3) {
-                                    title = data.item(0).textContent;
-                                    let temp = data.item(1).textContent;
-                                    company = (_c = temp === null || temp === void 0 ? void 0 : temp.split(" · ")) === null || _c === void 0 ? void 0 : _c[0];
-                                    employmentType = (_d = temp === null || temp === void 0 ? void 0 : temp.split(" · ")) === null || _d === void 0 ? void 0 : _d[1];
-                                    temp = data.item(2).textContent;
-                                    const startDatePart = (temp === null || temp === void 0 ? void 0 : temp.split(" - ")[0]) || null;
-                                    startDate = (startDatePart === null || startDatePart === void 0 ? void 0 : startDatePart.trim()) || null;
-                                    const endDatePart = ((_e = temp === null || temp === void 0 ? void 0 : temp.split(" - ")[1]) === null || _e === void 0 ? void 0 : _e.split(" · ")[0]) || null;
-                                    endDateIsPresent =
-                                        (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim().toLowerCase().includes("present")) ||
-                                            (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim()) === "현재" ||
-                                            false;
-                                    endDate =
-                                        endDatePart && !endDateIsPresent
-                                            ? endDatePart.trim()
-                                            : "Present";
-                                    if (data.length >= 4) {
-                                        location = data.item(3).textContent;
+                                else {
+                                    let data = node.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
+                                    if (data.length >= 3) {
+                                        title = data.item(0).textContent;
+                                        let temp = data.item(1).textContent;
+                                        company = (_c = temp === null || temp === void 0 ? void 0 : temp.split(" · ")) === null || _c === void 0 ? void 0 : _c[0];
+                                        employmentType = (_d = temp === null || temp === void 0 ? void 0 : temp.split(" · ")) === null || _d === void 0 ? void 0 : _d[1];
+                                        temp = data.item(2).textContent;
+                                        const startDatePart = (temp === null || temp === void 0 ? void 0 : temp.split(" - ")[0]) || null;
+                                        startDate = (startDatePart === null || startDatePart === void 0 ? void 0 : startDatePart.trim()) || null;
+                                        const endDatePart = ((_e = temp === null || temp === void 0 ? void 0 : temp.split(" - ")[1]) === null || _e === void 0 ? void 0 : _e.split(" · ")[0]) || null;
+                                        endDateIsPresent =
+                                            (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim().toLowerCase().includes("present")) ||
+                                                (endDatePart === null || endDatePart === void 0 ? void 0 : endDatePart.trim()) === "현재" ||
+                                                false;
+                                        endDate =
+                                            endDatePart && !endDateIsPresent
+                                                ? endDatePart.trim()
+                                                : "Present";
+                                        if (data.length >= 4) {
+                                            location = data.item(3).textContent;
+                                        }
                                     }
+                                    data = node.querySelector(':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]');
+                                    if (data) {
+                                        description = data.innerHTML
+                                            .replace(/<!---->/gi, "")
+                                            .replace(/<br(\/)?>/gi, "\n");
+                                    }
+                                    result.push({
+                                        title,
+                                        company,
+                                        employmentType,
+                                        location,
+                                        startDate,
+                                        endDate,
+                                        endDateIsPresent,
+                                        description,
+                                    });
                                 }
-                                data = node.querySelector(':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]');
-                                if (data) {
-                                    description = data.innerHTML
-                                        .replace(/<!---->/gi, "")
-                                        .replace(/<br(\/)?>/gi, "\n");
-                                }
-                                result.push({
-                                    title,
-                                    company,
-                                    employmentType,
-                                    location,
-                                    startDate,
-                                    endDate,
-                                    endDateIsPresent,
-                                    description,
-                                });
-                            }
-                        });
-                    }
-                    return result;
-                });
+                            });
+                        }
+                        return result;
+                    });
+                }
                 const experiences = rawExperiencesData.map((rawExperience) => {
                     const startDate = utils_1.formatDate(rawExperience.startDate);
                     const endDate = utils_1.formatDate(rawExperience.endDate) || null;

@@ -792,83 +792,462 @@ export class LinkedInProfileScraper {
       };
 
       statusLog(logSection, `Parsing experiences data...`, scraperSessionId);
+      let seeMoreSelector2 = await page.evaluate(() => {
+        try {
+          const seeMore = document
+            .querySelector("#experience")
+            ?.nextElementSibling?.nextElementSibling?.querySelector(
+              "div.pvs-list__footer-wrapper a.optional-action-target-wrapper"
+            );
+          if (seeMore) {
+            // in case of see more
+            const skillsElement = document.querySelector("#experience");
+            return `#${
+              skillsElement!.parentElement!.id
+            } .pvs-list__outer-container div.pvs-list__footer-wrapper a.optional-action-target-wrapper`;
+          } else {
+            return null;
+          }
+        } catch (error) {
+          return null;
+        }
+      });
+      let rawExperiencesData: RawExperience[];
+      if (seeMoreSelector2) {
+        try {
+          await Promise.all([
+            page.waitForNavigation({
+              timeout: this.options.timeout,
+              waitUntil: "domcontentloaded",
+            }),
+            page.click(seeMoreSelector2, {}),
+          ]);
+          await page.waitForTimeout(2000);
+          await autoScroll(page);
+          await page.waitForTimeout(500);
+          rawExperiencesData = await page.evaluate(() => {
+            let experiences = document
+              .querySelector(".pvs-list")
+              ?.querySelectorAll(
+                `.pvs-list__paged-list-item .pvs-entity.pvs-entity--padded`
+              );
+            // Note: the $$eval context is the browser context.
+            // So custom methods you define in this file are not available within this $$eval such as statusLog.
 
-      const rawExperiencesData = await page.evaluate(() => {
-        const experiences = document
-          .querySelector("#experience")
-          ?.nextElementSibling?.nextElementSibling?.querySelectorAll(
-            ".pvs-entity.pvs-entity--padded"
-          );
-        let result: RawExperience[] = [];
-
-        // Using a for loop so we can use await inside of it
-        if (experiences) {
-          experiences.forEach((node) => {
-            let title,
-              employmentType,
-              company,
-              description,
-              startDate,
-              endDate,
-              endDateIsPresent,
-              location;
-            if (
-              node.querySelectorAll('a[data-field="experience_company_logo"]')
-                .length > 1
-            ) {
-              // multiple experiences for one company
-              let data: Element | NodeListOf<Element> | null =
-                node.querySelectorAll(
-                  ':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]'
-                );
-              if (data.length > 0) {
-                company = data.item(0).textContent;
-                let detailExperiences = node.querySelectorAll(
-                  ":scope > div:nth-child(2) > div:nth-child(2) div.pvs-entity"
-                );
-                for (let i = 0; i < detailExperiences.length; i++) {
-                  let detailNode = detailExperiences.item(i);
-                  employmentType = null;
-                  title = null;
-                  description = null;
-                  startDate = null;
-                  endDate = null;
-                  endDateIsPresent = null;
-                  location = null;
-                  let detailData: Element | NodeListOf<Element> | null =
-                    detailNode.querySelectorAll(
+            let result: RawExperience[] = [];
+            if (experiences) {
+              experiences.forEach((node) => {
+                let title,
+                  employmentType,
+                  company,
+                  description,
+                  startDate,
+                  endDate,
+                  endDateIsPresent,
+                  location;
+                if (
+                  node.querySelectorAll(
+                    'a[data-field="experience_company_logo"]'
+                  ).length > 1
+                ) {
+                  // multiple experiences for one company
+                  let data: Element | NodeListOf<Element> | null =
+                    node.querySelectorAll(
                       ':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]'
                     );
-                  if (detailData.length > 0) {
-                    title = detailData.item(0).textContent;
-                    if (detailData.length > 1) {
-                      let temp = detailData.item(1).textContent;
-                      // date or employment type
-                      if (temp && temp.indexOf(" - ") >= 0) {
-                        // date
-                        const startDatePart = temp?.split(" - ")[0] || null;
-                        startDate = startDatePart?.trim() || null;
+                  if (data.length > 0) {
+                    company = data.item(0).textContent;
+                    let detailExperiences = node.querySelectorAll(
+                      ":scope > div:nth-child(2) > div:nth-child(2) div.pvs-entity"
+                    );
+                    for (let i = 0; i < detailExperiences.length; i++) {
+                      let detailNode = detailExperiences.item(i);
+                      employmentType = null;
+                      title = null;
+                      description = null;
+                      startDate = null;
+                      endDate = null;
+                      endDateIsPresent = null;
+                      location = null;
+                      let detailData: Element | NodeListOf<Element> | null =
+                        detailNode.querySelectorAll(
+                          ':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]'
+                        );
+                      if (detailData.length > 0) {
+                        title = detailData.item(0).textContent;
+                        if (detailData.length > 1) {
+                          let temp = detailData.item(1).textContent;
+                          // date or employment type
+                          if (temp && temp.indexOf(" - ") >= 0) {
+                            // date
+                            const startDatePart = temp?.split(" - ")[0] || null;
+                            startDate = startDatePart?.trim() || null;
 
-                        const endDatePart =
-                          temp?.split(" - ")[1]?.split(" · ")[0] || null;
-                        endDateIsPresent =
-                          endDatePart
-                            ?.trim()
-                            .toLowerCase()
-                            .includes("present") ||
-                          endDatePart?.trim() === "현재" ||
-                          false;
-                        endDate =
-                          endDatePart && !endDateIsPresent
-                            ? endDatePart.trim()
-                            : "Present";
-                      } else {
-                        // employment type
-                        employmentType = temp;
+                            const endDatePart =
+                              temp?.split(" - ")[1]?.split(" · ")[0] || null;
+                            endDateIsPresent =
+                              endDatePart
+                                ?.trim()
+                                .toLowerCase()
+                                .includes("present") ||
+                              endDatePart?.trim() === "현재" ||
+                              false;
+                            endDate =
+                              endDatePart && !endDateIsPresent
+                                ? endDatePart.trim()
+                                : "Present";
+                          } else {
+                            // employment type
+                            employmentType = temp;
+                          }
+                          if (detailData.length > 2) {
+                            temp = detailData.item(2).textContent;
+                            // date or location
+                            if (temp && temp.indexOf(" - ") >= 0) {
+                              // date
+                              const startDatePart =
+                                temp?.split(" - ")[0] || null;
+                              startDate = startDatePart?.trim() || null;
+
+                              const endDatePart =
+                                temp?.split(" - ")[1]?.split(" · ")[0] || null;
+                              endDateIsPresent =
+                                endDatePart
+                                  ?.trim()
+                                  .toLowerCase()
+                                  .includes("present") ||
+                                endDatePart?.trim() === "현재" ||
+                                false;
+                              endDate =
+                                endDatePart && !endDateIsPresent
+                                  ? endDatePart.trim()
+                                  : "Present";
+                              if (detailData.length > 3) {
+                                location = detailData.item(3).textContent;
+                              }
+                            } else {
+                              // location
+                              location = temp;
+                            }
+                          }
+                        }
+                        detailData = detailNode.querySelector(
+                          ':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]'
+                        );
+                        if (detailData) {
+                          description = detailData.innerHTML
+                            .replace(/<!---->/gi, "")
+                            .replace(/<br(\/)?>/gi, "\n");
+                        }
+                        result.push({
+                          title,
+                          company,
+                          employmentType,
+                          location,
+                          startDate,
+                          endDate,
+                          endDateIsPresent,
+                          description,
+                        });
                       }
-                      if (detailData.length > 2) {
-                        temp = detailData.item(2).textContent;
-                        // date or location
+                    }
+                  }
+                } else {
+                  // single experience for one company
+                  let data: Element | NodeListOf<Element> | null =
+                    node.querySelectorAll(
+                      ':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]'
+                    );
+                  if (data.length >= 3) {
+                    // software engineer
+                    title = data.item(0).textContent;
+                    // company, employment type
+                    let temp = data.item(1).textContent;
+                    company = temp?.split(" · ")?.[0];
+                    employmentType = temp?.split(" · ")?.[1];
+                    // date
+                    temp = data.item(2).textContent;
+                    const startDatePart = temp?.split(" - ")[0] || null;
+                    startDate = startDatePart?.trim() || null;
+
+                    const endDatePart =
+                      temp?.split(" - ")[1]?.split(" · ")[0] || null;
+                    endDateIsPresent =
+                      endDatePart?.trim().toLowerCase().includes("present") ||
+                      endDatePart?.trim() === "현재" ||
+                      false;
+                    endDate =
+                      endDatePart && !endDateIsPresent
+                        ? endDatePart.trim()
+                        : "Present";
+                    if (data.length >= 4) {
+                      // location
+                      location = data.item(3).textContent;
+                    }
+                  }
+                  data = node.querySelector(
+                    ':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]'
+                  );
+                  if (data) {
+                    description = data.innerHTML
+                      .replace(/<!---->/gi, "")
+                      .replace(/<br(\/)?>/gi, "\n");
+                  }
+                  result.push({
+                    title,
+                    company,
+                    employmentType,
+                    location,
+                    startDate,
+                    endDate,
+                    endDateIsPresent,
+                    description,
+                  });
+                }
+              });
+            }
+
+            return result;
+          });
+          page.goBack();
+          page.waitForTimeout(200);
+        } catch (error) {
+          rawExperiencesData = await page.evaluate(() => {
+            const experiences = document
+              .querySelector("#experience")
+              ?.nextElementSibling?.nextElementSibling?.querySelectorAll(
+                ".pvs-entity.pvs-entity--padded"
+              );
+            let result: RawExperience[] = [];
+
+            // Using a for loop so we can use await inside of it
+            if (experiences) {
+              experiences.forEach((node) => {
+                let title,
+                  employmentType,
+                  company,
+                  description,
+                  startDate,
+                  endDate,
+                  endDateIsPresent,
+                  location;
+                if (
+                  node.querySelectorAll(
+                    'a[data-field="experience_company_logo"]'
+                  ).length > 1
+                ) {
+                  // multiple experiences for one company
+                  let data: Element | NodeListOf<Element> | null =
+                    node.querySelectorAll(
+                      ':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]'
+                    );
+                  if (data.length > 0) {
+                    company = data.item(0).textContent;
+                    let detailExperiences = node.querySelectorAll(
+                      ":scope > div:nth-child(2) > div:nth-child(2) div.pvs-entity"
+                    );
+                    for (let i = 0; i < detailExperiences.length; i++) {
+                      let detailNode = detailExperiences.item(i);
+                      employmentType = null;
+                      title = null;
+                      description = null;
+                      startDate = null;
+                      endDate = null;
+                      endDateIsPresent = null;
+                      location = null;
+                      let detailData: Element | NodeListOf<Element> | null =
+                        detailNode.querySelectorAll(
+                          ':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]'
+                        );
+                      if (detailData.length > 0) {
+                        title = detailData.item(0).textContent;
+                        if (detailData.length > 1) {
+                          let temp = detailData.item(1).textContent;
+                          // date or employment type
+                          if (temp && temp.indexOf(" - ") >= 0) {
+                            // date
+                            const startDatePart = temp?.split(" - ")[0] || null;
+                            startDate = startDatePart?.trim() || null;
+
+                            const endDatePart =
+                              temp?.split(" - ")[1]?.split(" · ")[0] || null;
+                            endDateIsPresent =
+                              endDatePart
+                                ?.trim()
+                                .toLowerCase()
+                                .includes("present") ||
+                              endDatePart?.trim() === "현재" ||
+                              false;
+                            endDate =
+                              endDatePart && !endDateIsPresent
+                                ? endDatePart.trim()
+                                : "Present";
+                          } else {
+                            // employment type
+                            employmentType = temp;
+                          }
+                          if (detailData.length > 2) {
+                            temp = detailData.item(2).textContent;
+                            // date or location
+                            if (temp && temp.indexOf(" - ") >= 0) {
+                              // date
+                              const startDatePart =
+                                temp?.split(" - ")[0] || null;
+                              startDate = startDatePart?.trim() || null;
+
+                              const endDatePart =
+                                temp?.split(" - ")[1]?.split(" · ")[0] || null;
+                              endDateIsPresent =
+                                endDatePart
+                                  ?.trim()
+                                  .toLowerCase()
+                                  .includes("present") ||
+                                endDatePart?.trim() === "현재" ||
+                                false;
+                              endDate =
+                                endDatePart && !endDateIsPresent
+                                  ? endDatePart.trim()
+                                  : "Present";
+                              if (detailData.length > 3) {
+                                location = detailData.item(3).textContent;
+                              }
+                            } else {
+                              // location
+                              location = temp;
+                            }
+                          }
+                        }
+                        detailData = detailNode.querySelector(
+                          ':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]'
+                        );
+                        if (detailData) {
+                          description = detailData.innerHTML
+                            .replace(/<!---->/gi, "")
+                            .replace(/<br(\/)?>/gi, "\n");
+                        }
+                        result.push({
+                          title,
+                          company,
+                          employmentType,
+                          location,
+                          startDate,
+                          endDate,
+                          endDateIsPresent,
+                          description,
+                        });
+                      }
+                    }
+                  }
+                } else {
+                  // single experience for one company
+                  let data: Element | NodeListOf<Element> | null =
+                    node.querySelectorAll(
+                      ':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]'
+                    );
+                  if (data.length >= 3) {
+                    // software engineer
+                    title = data.item(0).textContent;
+                    // company, employment type
+                    let temp = data.item(1).textContent;
+                    company = temp?.split(" · ")?.[0];
+                    employmentType = temp?.split(" · ")?.[1];
+                    // date
+                    temp = data.item(2).textContent;
+                    const startDatePart = temp?.split(" - ")[0] || null;
+                    startDate = startDatePart?.trim() || null;
+
+                    const endDatePart =
+                      temp?.split(" - ")[1]?.split(" · ")[0] || null;
+                    endDateIsPresent =
+                      endDatePart?.trim().toLowerCase().includes("present") ||
+                      endDatePart?.trim() === "현재" ||
+                      false;
+                    endDate =
+                      endDatePart && !endDateIsPresent
+                        ? endDatePart.trim()
+                        : "Present";
+                    if (data.length >= 4) {
+                      // location
+                      location = data.item(3).textContent;
+                    }
+                  }
+                  data = node.querySelector(
+                    ':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]'
+                  );
+                  if (data) {
+                    description = data.innerHTML
+                      .replace(/<!---->/gi, "")
+                      .replace(/<br(\/)?>/gi, "\n");
+                  }
+                  result.push({
+                    title,
+                    company,
+                    employmentType,
+                    location,
+                    startDate,
+                    endDate,
+                    endDateIsPresent,
+                    description,
+                  });
+                }
+              });
+            }
+
+            return result;
+          });
+        }
+      } else {
+        rawExperiencesData = await page.evaluate(() => {
+          const experiences = document
+            .querySelector("#experience")
+            ?.nextElementSibling?.nextElementSibling?.querySelectorAll(
+              ".pvs-entity.pvs-entity--padded"
+            );
+          let result: RawExperience[] = [];
+
+          // Using a for loop so we can use await inside of it
+          if (experiences) {
+            experiences.forEach((node) => {
+              let title,
+                employmentType,
+                company,
+                description,
+                startDate,
+                endDate,
+                endDateIsPresent,
+                location;
+              if (
+                node.querySelectorAll('a[data-field="experience_company_logo"]')
+                  .length > 1
+              ) {
+                // multiple experiences for one company
+                let data: Element | NodeListOf<Element> | null =
+                  node.querySelectorAll(
+                    ':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]'
+                  );
+                if (data.length > 0) {
+                  company = data.item(0).textContent;
+                  let detailExperiences = node.querySelectorAll(
+                    ":scope > div:nth-child(2) > div:nth-child(2) div.pvs-entity"
+                  );
+                  for (let i = 0; i < detailExperiences.length; i++) {
+                    let detailNode = detailExperiences.item(i);
+                    employmentType = null;
+                    title = null;
+                    description = null;
+                    startDate = null;
+                    endDate = null;
+                    endDateIsPresent = null;
+                    location = null;
+                    let detailData: Element | NodeListOf<Element> | null =
+                      detailNode.querySelectorAll(
+                        ':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]'
+                      );
+                    if (detailData.length > 0) {
+                      title = detailData.item(0).textContent;
+                      if (detailData.length > 1) {
+                        let temp = detailData.item(1).textContent;
+                        // date or employment type
                         if (temp && temp.indexOf(" - ") >= 0) {
                           // date
                           const startDatePart = temp?.split(" - ")[0] || null;
@@ -887,203 +1266,119 @@ export class LinkedInProfileScraper {
                             endDatePart && !endDateIsPresent
                               ? endDatePart.trim()
                               : "Present";
-                          if (detailData.length > 3) {
-                            location = detailData.item(3).textContent;
-                          }
                         } else {
-                          // location
-                          location = temp;
+                          // employment type
+                          employmentType = temp;
+                        }
+                        if (detailData.length > 2) {
+                          temp = detailData.item(2).textContent;
+                          // date or location
+                          if (temp && temp.indexOf(" - ") >= 0) {
+                            // date
+                            const startDatePart = temp?.split(" - ")[0] || null;
+                            startDate = startDatePart?.trim() || null;
+
+                            const endDatePart =
+                              temp?.split(" - ")[1]?.split(" · ")[0] || null;
+                            endDateIsPresent =
+                              endDatePart
+                                ?.trim()
+                                .toLowerCase()
+                                .includes("present") ||
+                              endDatePart?.trim() === "현재" ||
+                              false;
+                            endDate =
+                              endDatePart && !endDateIsPresent
+                                ? endDatePart.trim()
+                                : "Present";
+                            if (detailData.length > 3) {
+                              location = detailData.item(3).textContent;
+                            }
+                          } else {
+                            // location
+                            location = temp;
+                          }
                         }
                       }
+                      detailData = detailNode.querySelector(
+                        ':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]'
+                      );
+                      if (detailData) {
+                        description = detailData.innerHTML
+                          .replace(/<!---->/gi, "")
+                          .replace(/<br(\/)?>/gi, "\n");
+                      }
+                      result.push({
+                        title,
+                        company,
+                        employmentType,
+                        location,
+                        startDate,
+                        endDate,
+                        endDateIsPresent,
+                        description,
+                      });
                     }
-                    detailData = detailNode.querySelector(
-                      ':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]'
-                    );
-                    if (detailData) {
-                      description = detailData.innerHTML
-                        .replace(/<!---->/gi, "")
-                        .replace(/<br(\/)?>/gi, "\n");
-                    }
-                    result.push({
-                      title,
-                      company,
-                      employmentType,
-                      location,
-                      startDate,
-                      endDate,
-                      endDateIsPresent,
-                      description,
-                    });
                   }
                 }
-              }
-            } else {
-              // single experience for one company
-              let data: Element | NodeListOf<Element> | null =
-                node.querySelectorAll(
-                  ':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]'
-                );
-              if (data.length >= 3) {
-                // software engineer
-                title = data.item(0).textContent;
-                // company, employment type
-                let temp = data.item(1).textContent;
-                company = temp?.split(" · ")?.[0];
-                employmentType = temp?.split(" · ")?.[1];
-                // date
-                temp = data.item(2).textContent;
-                const startDatePart = temp?.split(" - ")[0] || null;
-                startDate = startDatePart?.trim() || null;
+              } else {
+                // single experience for one company
+                let data: Element | NodeListOf<Element> | null =
+                  node.querySelectorAll(
+                    ':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]'
+                  );
+                if (data.length >= 3) {
+                  // software engineer
+                  title = data.item(0).textContent;
+                  // company, employment type
+                  let temp = data.item(1).textContent;
+                  company = temp?.split(" · ")?.[0];
+                  employmentType = temp?.split(" · ")?.[1];
+                  // date
+                  temp = data.item(2).textContent;
+                  const startDatePart = temp?.split(" - ")[0] || null;
+                  startDate = startDatePart?.trim() || null;
 
-                const endDatePart =
-                  temp?.split(" - ")[1]?.split(" · ")[0] || null;
-                endDateIsPresent =
-                  endDatePart?.trim().toLowerCase().includes("present") ||
-                  endDatePart?.trim() === "현재" ||
-                  false;
-                endDate =
-                  endDatePart && !endDateIsPresent
-                    ? endDatePart.trim()
-                    : "Present";
-                if (data.length >= 4) {
-                  // location
-                  location = data.item(3).textContent;
+                  const endDatePart =
+                    temp?.split(" - ")[1]?.split(" · ")[0] || null;
+                  endDateIsPresent =
+                    endDatePart?.trim().toLowerCase().includes("present") ||
+                    endDatePart?.trim() === "현재" ||
+                    false;
+                  endDate =
+                    endDatePart && !endDateIsPresent
+                      ? endDatePart.trim()
+                      : "Present";
+                  if (data.length >= 4) {
+                    // location
+                    location = data.item(3).textContent;
+                  }
                 }
+                data = node.querySelector(
+                  ':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]'
+                );
+                if (data) {
+                  description = data.innerHTML
+                    .replace(/<!---->/gi, "")
+                    .replace(/<br(\/)?>/gi, "\n");
+                }
+                result.push({
+                  title,
+                  company,
+                  employmentType,
+                  location,
+                  startDate,
+                  endDate,
+                  endDateIsPresent,
+                  description,
+                });
               }
-              data = node.querySelector(
-                ':scope > div:nth-child(2) > div:nth-child(2) span[aria-hidden="true"]'
-              );
-              if (data) {
-                description = data.innerHTML
-                  .replace(/<!---->/gi, "")
-                  .replace(/<br(\/)?>/gi, "\n");
-              }
-              result.push({
-                title,
-                company,
-                employmentType,
-                location,
-                startDate,
-                endDate,
-                endDateIsPresent,
-                description,
-              });
-            }
-          });
-        }
-
-        return result;
-      });
-      /*
-      const rawExperiencesData: RawExperience[] = await page.$$eval(
-        "#experience-section ul > .ember-view, #experience-section .pv-entity__position-group-role-item-fading-timeline, #experience-section .pv-entity__position-group-role-item",
-        (nodes) => {
-          let data: RawExperience[] = [];
-          let currentCompanySummary: object = {};
-
-          // Using a for loop so we can use await inside of it
-          for (const node of nodes) {
-            let title,
-              employmentType,
-              company,
-              description,
-              startDate,
-              endDate,
-              dateRangeText,
-              endDateIsPresent,
-              location;
-            if (
-              node.querySelector(".pv-entity__company-summary-info") != null
-            ) {
-              const companyElement = node.querySelector(
-                ".pv-entity__company-summary-info span:nth-child(2)"
-              );
-              currentCompanySummary["company_name"] =
-                companyElement?.textContent || null;
-
-              const descriptionElement = node.querySelector(
-                ".pv-entity__description"
-              );
-              currentCompanySummary[""] =
-                descriptionElement?.textContent || null;
-
-              continue;
-            }
-            if (
-              node.querySelector(
-                '[data-control-name="background_details_company"]'
-              ) != null
-            ) {
-              currentCompanySummary = {};
-            }
-            if (Object.keys(currentCompanySummary).length !== 0) {
-              const titleElement = node.querySelector("h3 span:nth-child(2)");
-              title = titleElement?.textContent || null;
-
-              const employmentTypeElement = node.querySelector("h4");
-              employmentType = employmentTypeElement?.textContent || null;
-
-              company = currentCompanySummary["company_name"];
-            } else {
-              const titleElement = node.querySelector("h3");
-              title = titleElement?.textContent || null;
-
-              const employmentTypeElement = node.querySelector(
-                "span.pv-entity__secondary-title"
-              );
-              employmentType = employmentTypeElement?.textContent || null;
-
-              const companyElement = node.querySelector(
-                ".pv-entity__secondary-title"
-              );
-              const companyElementClean =
-                companyElement && companyElement?.querySelector("span")
-                  ? companyElement?.removeChild(
-                      companyElement.querySelector("span") as Node
-                    ) && companyElement
-                  : companyElement || null;
-              company = companyElementClean?.textContent || null;
-            }
-
-            const descriptionElement = node.querySelector(
-              ".pv-entity__description"
-            );
-            description = descriptionElement?.textContent || null;
-
-            const dateRangeElement = node.querySelector(
-              ".pv-entity__date-range span:nth-child(2)"
-            );
-            dateRangeText = dateRangeElement?.textContent || null;
-
-            const startDatePart = dateRangeText?.split("–")[0] || null;
-            startDate = startDatePart?.trim() || null;
-
-            const endDatePart = dateRangeText?.split("–")[1] || null;
-            endDateIsPresent =
-              endDatePart?.trim().toLowerCase() === "present" || false;
-            endDate =
-              endDatePart && !endDateIsPresent ? endDatePart.trim() : "Present";
-
-            const locationElement = node.querySelector(
-              ".pv-entity__location span:nth-child(2)"
-            );
-            location = locationElement?.textContent || null;
-
-            data.push({
-              title,
-              company,
-              employmentType,
-              location,
-              startDate,
-              endDate,
-              endDateIsPresent,
-              description,
             });
           }
 
-          return data;
-        }
-      );*/
+          return result;
+        });
+      }
 
       // Convert the raw data to clean data using our utils
       // So we don't have to inject our util methods inside the browser context, which is too damn difficult using TypeScript
