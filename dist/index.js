@@ -313,7 +313,9 @@ class LinkedInProfileScraper {
                                 experiences.forEach((node) => {
                                     var _a, _b, _c, _d, _e;
                                     let title, employmentType, company, description, startDate, endDate, endDateIsPresent, location;
-                                    if (node.querySelectorAll('a[data-field="experience_company_logo"]').length > 1) {
+                                    if (node.querySelectorAll('a[data-field="experience_company_logo"]').length > 1 ||
+                                        node.querySelectorAll("a.optional-action-target-wrapper")
+                                            .length > 1) {
                                         let data = node.querySelectorAll(':scope > div:nth-child(2) > div:first-child span[aria-hidden="true"]');
                                         if (data.length > 0) {
                                             company = data.item(0).textContent;

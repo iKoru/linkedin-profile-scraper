@@ -848,7 +848,9 @@ export class LinkedInProfileScraper {
                 if (
                   node.querySelectorAll(
                     'a[data-field="experience_company_logo"]'
-                  ).length > 1
+                  ).length > 1 ||
+                  node.querySelectorAll("a.optional-action-target-wrapper")
+                    .length > 1
                 ) {
                   // multiple experiences for one company
                   let data: Element | NodeListOf<Element> | null =
